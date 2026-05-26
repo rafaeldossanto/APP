@@ -2,23 +2,22 @@ package com.app.APP.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.hibernate.annotations.Immutable;
 
 
 @Entity
+@Table(name = "usuario")
 @Getter
-@Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Immutable
 public class Usuario {
 
-    private @Id String id;
+    @Id
+    private String id;
+    private String nome;
     private String email;
-
-
+    private String codigoUsuario;
 }

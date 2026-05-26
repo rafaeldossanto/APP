@@ -1,7 +1,6 @@
 package com.app.APP.entity;
 
-import com.app.APP.model.enums.StatusAventura;
-import com.app.APP.model.enums.VisibilidadeAventura;
+import com.app.APP.model.enums.TipoEvidencia;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,37 +18,41 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "aventuras")
+@Table(name = "evidencias")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Aventura {
+public class Evidencia {
 
     @Id
     private String id;
 
-    @Column(nullable = false)
-    private String usuarioId; // criador
-
     @ManyToOne
-    @JoinColumn(name = "regiao_id")
-    private Regiao regiao;
+    @JoinColumn(name = "ponto_id", nullable = false)
+    private PontoInteresse ponto;
 
     @Column(nullable = false)
-    private String destino;
+    private String usuarioId;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Builder.Default
-    private StatusAventura status = StatusAventura.PLANEJADA;
+    private String fotoUrl;
 
     @Enumerated(EnumType.STRING)
+    private TipoEvidencia tipoEvidencia;
+
+    private Double latCaptura;
+    private Double lngCaptura;
+    private Double distanciaDopontoM;
+
     @Column(nullable = false)
     @Builder.Default
-    private VisibilidadeAventura visibilidade = VisibilidadeAventura.PRIVADA;
+    private Boolean capturadaNoApp = false;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean validada = false;
 
     private LocalDateTime criadoEm;
-    private LocalDateTime atualizadoEm;
 }

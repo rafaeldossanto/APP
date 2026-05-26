@@ -1,7 +1,6 @@
 package com.app.APP.entity;
 
-import com.app.APP.model.enums.StatusAventura;
-import com.app.APP.model.enums.VisibilidadeAventura;
+import com.app.APP.model.enums.TipoMidia;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,37 +18,40 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "aventuras")
+@Table(name = "midias")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Aventura {
+public class Midia {
 
     @Id
     private String id;
 
-    @Column(nullable = false)
-    private String usuarioId; // criador
-
     @ManyToOne
-    @JoinColumn(name = "regiao_id")
-    private Regiao regiao;
+    @JoinColumn(name = "aventura_id", nullable = false)
+    private Aventura aventura;
+
+    // nullable — se nulo, midia é avulsa na aventura
+    @ManyToOne
+    @JoinColumn(name = "caminho_id")
+    private Caminho caminho;
 
     @Column(nullable = false)
-    private String destino;
+    private String usuarioId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Builder.Default
-    private StatusAventura status = StatusAventura.PLANEJADA;
+    private TipoMidia tipo;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Builder.Default
-    private VisibilidadeAventura visibilidade = VisibilidadeAventura.PRIVADA;
+    private String url;
 
-    private LocalDateTime criadoEm;
-    private LocalDateTime atualizadoEm;
+    private Double latCaptura;
+    private Double lngCaptura;
+    private Double distanciaNaCapturaKm;
+    private Double percentualNoCaminho; // ex: 0.20 = 20%
+
+    private LocalDateTime capturadaEm;
 }

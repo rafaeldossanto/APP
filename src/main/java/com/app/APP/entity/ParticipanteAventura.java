@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,13 +16,16 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "caminhos")
+@Table(
+        name = "participantes_aventura",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"aventura_id", "usuario_id"})
+)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Caminho {
+public class ParticipanteAventura {
 
     @Id
     private String id;
@@ -30,13 +34,8 @@ public class Caminho {
     @JoinColumn(name = "aventura_id", nullable = false)
     private Aventura aventura;
 
-    @Column(nullable = false)
+    @Column(name = "usuario_id", nullable = false)
     private String usuarioId;
 
-    private String cor;
-    private Integer numero;
-
-    private LocalDateTime iniciadoEm;
-    private LocalDateTime finalizadoEm;
-    private Double distanciaTotalKm;
+    private LocalDateTime entradoEm;
 }

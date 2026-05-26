@@ -1,8 +1,13 @@
 package com.app.APP.entity;
 
 import com.app.APP.model.enums.StatusAmizade;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +17,10 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(
+        name = "amizades",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"solicitante_id", "receptor_id"})
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,13 +28,20 @@ import java.time.LocalDateTime;
 @Builder
 public class Amizades {
 
-    private @Id String id;
+    @Id
+    private String id;
 
+    @Column(name = "solicitante_id", nullable = false)
     private String solicitanteId;
+
+    @Column(name = "receptor_id", nullable = false)
     private String receptorId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     @Builder.Default
     private StatusAmizade status = StatusAmizade.PENDENTE;
 
     private LocalDateTime solicitadoEm;
+    private LocalDateTime respondidoEm;
 }
