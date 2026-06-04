@@ -1,5 +1,6 @@
 package com.app.APP.model.dto.response;
 
+import com.app.APP.model.enums.Cores;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -9,7 +10,7 @@ public record CaminhoResponse(
         String id,
         String aventuraId,
         String usuarioId,
-        String cor,
+        Cores cor,
         Integer numero,
         LocalDateTime iniciadoEm,
         LocalDateTime finalizadoEm,

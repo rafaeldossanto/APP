@@ -3,6 +3,8 @@ package com.app.APP.service;
 import com.app.APP.entity.Aventura;
 import com.app.APP.entity.ParticipanteAventura;
 import com.app.APP.entity.Regiao;
+import com.app.APP.mapper.AventuraMapper;
+import com.app.APP.mapper.ParticipanteMapper;
 import com.app.APP.model.dto.request.AventuraRequest;
 import com.app.APP.model.dto.response.AventuraResponse;
 import com.app.APP.model.enums.StatusAventura;
@@ -17,6 +19,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static com.app.APP.mapper.AventuraMapper.toResponse;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -29,33 +33,12 @@ public class AventuraService {
     public AventuraResponse create(AventuraRequest request) {
         log.info("Criando aventura para usuario: {}", request.usuarioId());
 
-        Regiao regiao = null;
-        if (request.regiaoId() != null) {
-            regiao = regiaoRepository.findById(request.regiaoId())
-                    .orElseThrow(() -> new IllegalArgumentException("Regiao nao encontrada"));
-        }
+        Regiao regiao = regiaoRepository.findById(request.regiaoId())
+                .orElseThrow(() -> new IllegalArgumentException("regiao nao encontrada"));
 
-        Aventura aventura = Aventura.builder()
-                .id(UUID.randomUUID().toString())
-                .usuarioId(request.usuarioId())
-                .regiao(regiao)
-                .destino(request.destino())
-                .visibilidade(request.visibilidade())
-                .criadoEm(LocalDateTime.now())
-                .atualizadoEm(LocalDateTime.now())
-                .build();
+        var aventura = aventuraRepository.save(AventuraMapper.toEntity(request, regiao));
 
-        aventuraRepository.save(aventura);
-
-        // criador ja entra como participante automaticamente
-        ParticipanteAventura participante = ParticipanteAventura.builder()
-                .id(UUID.randomUUID().toString())
-                .aventura(aventura)
-                .usuarioId(request.usuarioId())
-                .entradoEm(LocalDateTime.now())
-                .build();
-
-        participanteRepository.save(participante);
+        participanteRepository.save(ParticipanteMapper.toEntity(aventura, request));
 
         log.info("Aventura criada com id: {}", aventura.getId());
         return toResponse(aventura);
@@ -67,7 +50,7 @@ public class AventuraService {
 
     public List<AventuraResponse> getByUsuario(String usuarioId) {
         return aventuraRepository.findByUsuarioId(usuarioId)
-                .stream().map(this::toResponse).toList();
+                .stream().map(AventuraMapper::toResponse).toList();
     }
 
     public AventuraResponse atualizarStatus(String id, StatusAventura status) {
@@ -85,14 +68,7 @@ public class AventuraService {
             throw new IllegalArgumentException("Usuario ja participa dessa aventura");
         }
 
-        ParticipanteAventura participante = ParticipanteAventura.builder()
-                .id(UUID.randomUUID().toString())
-                .aventura(aventura)
-                .usuarioId(usuarioId)
-                .entradoEm(LocalDateTime.now())
-                .build();
-
-        participanteRepository.save(participante);
+        participanteRepository.save(ParticipanteMapper.toEntity(aventura,  usuarioId));
         log.info("Usuario {} adicionado a aventura {}", usuarioId, aventuraId);
     }
 
@@ -107,15 +83,5 @@ public class AventuraService {
                 .orElseThrow(() -> new IllegalArgumentException("Aventura nao encontrada"));
     }
 
-    private AventuraResponse toResponse(Aventura a) {
-        return AventuraResponse.builder()
-                .id(a.getId())
-                .usuarioId(a.getUsuarioId())
-                .regiaoId(a.getRegiao() != null ? a.getRegiao().getId() : null)
-                .destino(a.getDestino())
-                .status(a.getStatus())
-                .visibilidade(a.getVisibilidade())
-                .criadoEm(a.getCriadoEm())
-                .build();
-    }
+
 }

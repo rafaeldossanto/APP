@@ -2,6 +2,7 @@ package com.app.APP.service;
 
 import com.app.APP.entity.Aventura;
 import com.app.APP.entity.Caminho;
+import com.app.APP.mapper.CaminhoMapper;
 import com.app.APP.model.dto.request.CaminhoRequest;
 import com.app.APP.model.dto.response.CaminhoResponse;
 import com.app.APP.repository.AventuraRepository;
@@ -12,7 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
+
+import static com.app.APP.mapper.CaminhoMapper.toResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -30,19 +32,10 @@ public class CaminhoService {
         Aventura aventura = aventuraRepository.findById(request.aventuraId())
                 .orElseThrow(() -> new IllegalArgumentException("Aventura nao encontrada"));
 
-        Caminho caminho = Caminho.builder()
-                .id(UUID.randomUUID().toString())
-                .aventura(aventura)
-                .usuarioId(request.usuarioId())
-                .cor(request.cor())
-                .numero(request.numero())
-                .iniciadoEm(LocalDateTime.now())
-                .build();
-
-        return toResponse(caminhoRepository.save(caminho));
+        return toResponse(caminhoRepository.save(CaminhoMapper.toEntity(request, aventura)));
     }
 
-    // distancia total informada pelo servico de Localizacao ao finalizar
+
     public CaminhoResponse finalizar(String id, Double distanciaTotalKm) {
         log.info("Finalizando caminho: {}", id);
         Caminho caminho = findById(id);
@@ -55,12 +48,12 @@ public class CaminhoService {
 
     public List<CaminhoResponse> getByAventura(String aventuraId) {
         return caminhoRepository.findByAventuraId(aventuraId)
-                .stream().map(this::toResponse).toList();
+                .stream().map(CaminhoMapper::toResponse).toList();
     }
 
     public List<CaminhoResponse> getByUsuario(String usuarioId) {
         return caminhoRepository.findByUsuarioId(usuarioId)
-                .stream().map(this::toResponse).toList();
+                .stream().map(CaminhoMapper::toResponse).toList();
     }
 
     private Caminho findById(String id) {
@@ -68,16 +61,5 @@ public class CaminhoService {
                 .orElseThrow(() -> new IllegalArgumentException("Caminho nao encontrado"));
     }
 
-    private CaminhoResponse toResponse(Caminho c) {
-        return CaminhoResponse.builder()
-                .id(c.getId())
-                .aventuraId(c.getAventura().getId())
-                .usuarioId(c.getUsuarioId())
-                .cor(c.getCor())
-                .numero(c.getNumero())
-                .iniciadoEm(c.getIniciadoEm())
-                .finalizadoEm(c.getFinalizadoEm())
-                .distanciaTotalKm(c.getDistanciaTotalKm())
-                .build();
-    }
+
 }

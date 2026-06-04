@@ -1,6 +1,7 @@
 package com.app.APP.service;
 
 import com.app.APP.entity.Amizades;
+import com.app.APP.mapper.AmizadeMapper;
 import com.app.APP.model.dto.request.AmizadeRequest;
 import com.app.APP.model.dto.response.AmizadeResponse;
 import com.app.APP.model.enums.StatusAmizade;
@@ -13,6 +14,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import static com.app.APP.mapper.AmizadeMapper.toResponse;
+
 
 @Service
 @RequiredArgsConstructor
@@ -61,27 +65,16 @@ public class AmizadeService {
 
     public List<AmizadeResponse> getPendentes(String usuarioId) {
         return amizadesRepository.findByUsuarioIdAndStatus(usuarioId, StatusAmizade.PENDENTE)
-                .stream().map(this::toResponse).toList();
+                .stream().map(AmizadeMapper::toResponse).toList();
     }
 
     public List<AmizadeResponse> getAmigos(String usuarioId) {
         return amizadesRepository.findByUsuarioIdAndStatus(usuarioId, StatusAmizade.ACEITA)
-                .stream().map(this::toResponse).toList();
+                .stream().map(AmizadeMapper::toResponse).toList();
     }
 
     private Amizades findById(String id) {
         return amizadesRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Amizade nao encontrada"));
-    }
-
-    private AmizadeResponse toResponse(Amizades a) {
-        return AmizadeResponse.builder()
-                .id(a.getId())
-                .solicitanteId(a.getSolicitanteId())
-                .receptorId(a.getReceptorId())
-                .status(a.getStatus())
-                .solicitadoEm(a.getSolicitadoEm())
-                .respondidoEm(a.getRespondidoEm())
-                .build();
     }
 }
