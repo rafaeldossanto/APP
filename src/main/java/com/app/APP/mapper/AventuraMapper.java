@@ -8,7 +8,7 @@ import lombok.experimental.UtilityClass;
 
 import java.time.LocalDateTime;
 
-import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 @UtilityClass
 public class AventuraMapper {
@@ -28,7 +28,7 @@ public class AventuraMapper {
         return AventuraResponse.builder()
                 .id(aventura.getId())
                 .usuarioId(aventura.getUsuarioId())
-                .regiaoId(isNull(aventura.getRegiao()) ?  aventura.getRegiao().getId() : null)
+                .regiaoId(nonNull(aventura.getRegiao()) ? aventura.getRegiao().getId() : null)
                 .destino(aventura.getDestino())
                 .status(aventura.getStatus())
                 .visibilidade(aventura.getVisibilidade())

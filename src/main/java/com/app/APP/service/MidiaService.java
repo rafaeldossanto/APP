@@ -3,6 +3,7 @@ package com.app.APP.service;
 import com.app.APP.entity.Aventura;
 import com.app.APP.entity.Caminho;
 import com.app.APP.entity.Midia;
+import com.app.APP.mapper.MidiaMapper;
 import com.app.APP.model.dto.request.MidiaRequest;
 import com.app.APP.model.dto.response.MidiaResponse;
 import com.app.APP.repository.AventuraRepository;
@@ -12,9 +13,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
+
+import static java.util.Objects.nonNull;
 
 @Service
 @RequiredArgsConstructor
@@ -32,36 +33,24 @@ public class MidiaService {
                 .orElseThrow(() -> new IllegalArgumentException("Aventura nao encontrada"));
 
         Caminho caminho = null;
-        if (request.caminhoId() != null) {
+        if (nonNull(request.caminhoId())) {
             caminho = caminhoRepository.findById(request.caminhoId())
                     .orElseThrow(() -> new IllegalArgumentException("Caminho nao encontrado"));
         }
 
-        Midia midia = Midia.builder()
-                .id(UUID.randomUUID().toString())
-                .aventura(aventura)
-                .caminho(caminho)
-                .usuarioId(request.usuarioId())
-                .tipo(request.tipo())
-                .url(request.url())
-                .latCaptura(request.latCaptura())
-                .lngCaptura(request.lngCaptura())
-                .distanciaNaCapturaKm(request.distanciaNaCapturaKm())
-                .percentualNoCaminho(request.percentualNoCaminho())
-                .capturadaEm(LocalDateTime.now())
-                .build();
+        Midia midia = midiaRepository.save(MidiaMapper.toEntity(request, aventura, caminho));
 
-        return toResponse(midiaRepository.save(midia));
+        return MidiaMapper.toResponse(midia);
     }
 
     public List<MidiaResponse> getByAventura(String aventuraId) {
         return midiaRepository.findByAventuraId(aventuraId)
-                .stream().map(this::toResponse).toList();
+                .stream().map(MidiaMapper::toResponse).toList();
     }
 
     public List<MidiaResponse> getByCaminho(String caminhoId) {
         return midiaRepository.findByCaminhoId(caminhoId)
-                .stream().map(this::toResponse).toList();
+                .stream().map(MidiaMapper::toResponse).toList();
     }
 
     public void delete(String id) {
@@ -69,18 +58,5 @@ public class MidiaService {
                 .orElseThrow(() -> new IllegalArgumentException("Midia nao encontrada"));
         midiaRepository.delete(midia);
         log.info("Midia {} deletada", id);
-    }
-
-    private MidiaResponse toResponse(Midia m) {
-        return MidiaResponse.builder()
-                .id(m.getId())
-                .aventuraId(m.getAventura().getId())
-                .caminhoId(m.getCaminho() != null ? m.getCaminho().getId() : null)
-                .tipo(m.getTipo())
-                .url(m.getUrl())
-                .percentualNoCaminho(m.getPercentualNoCaminho())
-                .distanciaNaCapturaKm(m.getDistanciaNaCapturaKm())
-                .capturadaEm(m.getCapturadaEm())
-                .build();
     }
 }
