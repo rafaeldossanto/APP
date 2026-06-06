@@ -6,8 +6,6 @@ import com.app.APP.model.enums.StatusAmizade;
 import com.app.APP.service.AmizadeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,23 +25,23 @@ public class AmizadeController {
     private final AmizadeService amizadeService;
 
     @PostMapping
-    public ResponseEntity<AmizadeResponse> solicitar(@RequestBody @Valid AmizadeRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(amizadeService.solicitar(request));
+    public AmizadeResponse solicitar(@RequestBody @Valid AmizadeRequest request) {
+        return amizadeService.solicitar(request);
     }
 
     @PatchMapping("/{id}/responder")
-    public ResponseEntity<AmizadeResponse> responder(@PathVariable String id,
-                                                     @RequestParam StatusAmizade status) {
-        return ResponseEntity.ok(amizadeService.responder(id, status));
+    public AmizadeResponse responder(@PathVariable String id,
+                                     @RequestParam StatusAmizade status) {
+        return amizadeService.responder(id, status);
     }
 
     @GetMapping("/pendentes/{usuarioId}")
-    public ResponseEntity<List<AmizadeResponse>> getPendentes(@PathVariable String usuarioId) {
-        return ResponseEntity.ok(amizadeService.getPendentes(usuarioId));
+    public List<AmizadeResponse> getPendentes(@PathVariable String usuarioId) {
+        return amizadeService.getPendentes(usuarioId);
     }
 
     @GetMapping("/amigos/{usuarioId}")
-    public ResponseEntity<List<AmizadeResponse>> getAmigos(@PathVariable String usuarioId) {
-        return ResponseEntity.ok(amizadeService.getAmigos(usuarioId));
+    public List<AmizadeResponse> getAmigos(@PathVariable String usuarioId) {
+        return amizadeService.getAmigos(usuarioId);
     }
 }
