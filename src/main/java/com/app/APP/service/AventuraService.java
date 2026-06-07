@@ -13,10 +13,12 @@ import com.app.APP.repository.ParticipanteAventuraRepository;
 import com.app.APP.repository.RegiaoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static com.app.APP.mapper.AventuraMapper.toResponse;
 
@@ -29,6 +31,7 @@ public class AventuraService {
     private final ParticipanteAventuraRepository participanteRepository;
     private final RegiaoRepository regiaoRepository;
 
+    @Transactional
     public AventuraResponse create(AventuraRequest request) {
         log.info("Criando aventura para usuario: {}", request.usuarioId());
 
@@ -47,9 +50,9 @@ public class AventuraService {
         return toResponse(findById(id));
     }
 
-    public List<AventuraResponse> getByUsuario(String usuarioId) {
-        return aventuraRepository.findByUsuarioId(usuarioId)
-                .stream().map(AventuraMapper::toResponse).toList();
+    public Page<AventuraResponse> getByUsuario(String usuarioId, Pageable pageable) {
+        return aventuraRepository.findByUsuarioId(usuarioId, pageable)
+                .map(AventuraMapper::toResponse);
     }
 
     public AventuraResponse atualizarStatus(String id, StatusAventura status) {
@@ -78,9 +81,4 @@ public class AventuraService {
     }
 
     private Aventura findById(String id) {
-        return aventuraRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Aventura nao encontrada"));
-    }
-
-
-}
+        r

@@ -14,6 +14,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -91,25 +95,18 @@ class CaminhoServiceTest {
     }
 
     @Test
-    @DisplayName("getByAventura deve mapear lista")
+    @DisplayName("getByAventura deve mapear pagina")
     void deveListarPorAventura() {
-        when(caminhoRepository.findByAventuraId(AventuraStub.ID))
-                .thenReturn(List.of(CaminhoStub.umCaminho().build()));
+        Pageable pageable = PageRequest.of(0, 10);
+        when(caminhoRepository.findByAventuraId(AventuraStub.ID, pageable))
+                .thenReturn(new PageImpl<>(List.of(CaminhoStub.umCaminho().build())));
 
-        List<CaminhoResponse> response = service.getByAventura(AventuraStub.ID);
+        Page<CaminhoResponse> response = service.getByAventura(AventuraStub.ID, pageable);
 
-        assertThat(response).hasSize(1);
-        assertThat(response.get(0).aventuraId()).isEqualTo(AventuraStub.ID);
+        assertThat(response.getContent()).hasSize(1);
+        assertThat(response.getContent().get(0).aventuraId()).isEqualTo(AventuraStub.ID);
     }
 
     @Test
-    @DisplayName("getByUsuario deve mapear lista")
-    void deveListarPorUsuario() {
-        when(caminhoRepository.findByUsuarioId(CaminhoStub.USUARIO_ID))
-                .thenReturn(List.of(CaminhoStub.umCaminho().build()));
-
-        List<CaminhoResponse> response = service.getByUsuario(CaminhoStub.USUARIO_ID);
-
-        assertThat(response).hasSize(1);
-    }
-}
+    @DisplayName("getByUsuario deve mapear pagina")
+    v

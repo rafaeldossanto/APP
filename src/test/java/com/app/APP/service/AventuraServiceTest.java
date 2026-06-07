@@ -17,6 +17,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -96,15 +100,16 @@ class AventuraServiceTest {
     }
 
     @Test
-    @DisplayName("getByUsuario deve mapear lista de aventuras")
+    @DisplayName("getByUsuario deve mapear pagina de aventuras")
     void deveListarPorUsuario() {
-        when(aventuraRepository.findByUsuarioId(AventuraStub.USUARIO_ID))
-                .thenReturn(List.of(AventuraStub.umaAventura().build()));
+        Pageable pageable = PageRequest.of(0, 10);
+        when(aventuraRepository.findByUsuarioId(AventuraStub.USUARIO_ID, pageable))
+                .thenReturn(new PageImpl<>(List.of(AventuraStub.umaAventura().build())));
 
-        List<AventuraResponse> response = service.getByUsuario(AventuraStub.USUARIO_ID);
+        Page<AventuraResponse> response = service.getByUsuario(AventuraStub.USUARIO_ID, pageable);
 
-        assertThat(response).hasSize(1);
-        assertThat(response.get(0).usuarioId()).isEqualTo(AventuraStub.USUARIO_ID);
+        assertThat(response.getContent()).hasSize(1);
+        assertThat(response.getContent().get(0).usuarioId()).isEqualTo(AventuraStub.USUARIO_ID);
     }
 
     @Test
@@ -151,13 +156,4 @@ class AventuraServiceTest {
     }
 
     @Test
-    @DisplayName("delete deve remover aventura existente")
-    void deveDeletar() {
-        Aventura aventura = AventuraStub.umaAventura().build();
-        when(aventuraRepository.findById(AventuraStub.ID)).thenReturn(Optional.of(aventura));
-
-        service.delete(AventuraStub.ID);
-
-        verify(aventuraRepository).delete(aventura);
-    }
-}
+    @DisplayName("delete deve remover

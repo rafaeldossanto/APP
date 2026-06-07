@@ -6,6 +6,8 @@ import com.app.APP.model.enums.StatusAventura;
 import com.app.APP.service.AventuraService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -15,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/aventura")
@@ -36,8 +36,8 @@ public class AventuraController {
     }
 
     @GetMapping("/usuario/{usuarioId}")
-    public List<AventuraResponse> getByUsuario(@PathVariable String usuarioId) {
-        return aventuraService.getByUsuario(usuarioId);
+    public Page<AventuraResponse> getByUsuario(@PathVariable String usuarioId, Pageable pageable) {
+        return aventuraService.getByUsuario(usuarioId, pageable);
     }
 
     @PatchMapping("/{id}/status")
@@ -52,8 +52,4 @@ public class AventuraController {
         aventuraService.adicionarParticipante(id, usuarioId);
     }
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable String id) {
-        aventuraService.delete(id);
-    }
-}
+    @DeleteMapping("/{i

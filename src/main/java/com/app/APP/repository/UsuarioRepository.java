@@ -1,5 +1,4 @@
 package com.app.APP.repository;
 
-public interface UsuarioRepository {
-    boolean existsById(String id);
-}
+import com.app.APP.entity.Usuario;
+import org.springframework.data.jpa.reposito

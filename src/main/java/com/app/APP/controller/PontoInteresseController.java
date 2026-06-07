@@ -7,14 +7,14 @@ import com.app.APP.model.dto.response.PontoInteresseResponse;
 import com.app.APP.service.PontoInteresseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/ponto-interesse")
@@ -34,12 +34,9 @@ public class PontoInteresseController {
     }
 
     @GetMapping("/caminho/{caminhoId}")
-    public List<PontoInteresseResponse> getByCaminho(@PathVariable String caminhoId) {
-        return pontoInteresseService.getByCaminho(caminhoId);
+    public Page<PontoInteresseResponse> getByCaminho(@PathVariable String caminhoId, Pageable pageable) {
+        return pontoInteresseService.getByCaminho(caminhoId, pageable);
     }
 
     @PostMapping("/evidencia")
-    public EvidenciaResponse adicionarEvidencia(@RequestBody @Valid EvidenciaRequest request) {
-        return pontoInteresseService.adicionarEvidencia(request);
-    }
-}
+    public EvidenciaResponse adicionarEvidencia(@RequestBody @Valid Evi

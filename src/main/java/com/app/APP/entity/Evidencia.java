@@ -5,7 +5,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -18,7 +20,9 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "evidencias")
+@Table(name = "evidencias", indexes = {
+        @Index(name = "idx_evidencia_ponto", columnList = "ponto_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,7 +33,7 @@ public class Evidencia {
     @Id
     private String id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ponto_id", nullable = false)
     private PontoInteresse ponto;
 
@@ -47,12 +51,4 @@ public class Evidencia {
     private Double distanciaDopontoM;
 
     @Column(nullable = false)
-    @Builder.Default
-    private Boolean capturadaNoApp = false;
-
-    @Column(nullable = false)
-    @Builder.Default
-    private Boolean validada = false;
-
-    private LocalDateTime criadoEm;
-}
+    @Builder.Def

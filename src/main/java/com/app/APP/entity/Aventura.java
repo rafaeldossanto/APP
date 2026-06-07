@@ -6,7 +6,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -19,7 +21,9 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "aventuras")
+@Table(name = "aventuras", indexes = {
+        @Index(name = "idx_aventura_usuario", columnList = "usuarioId")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -33,7 +37,7 @@ public class Aventura {
     @Column(nullable = false)
     private String usuarioId; // criador
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "regiao_id")
     private Regiao regiao;
 
@@ -46,10 +50,4 @@ public class Aventura {
     private StatusAventura status = StatusAventura.PLANEJADA;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    @Builder.Default
-    private VisibilidadeAventura visibilidade = VisibilidadeAventura.PRIVADA;
-
-    private LocalDateTime criadoEm;
-    private LocalDateTime atualizadoEm;
-}
+    @Column(nullable = fal

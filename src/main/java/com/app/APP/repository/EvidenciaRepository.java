@@ -14,5 +14,5 @@ public interface EvidenciaRepository extends JpaRepository<Evidencia, String> {
     @Query("SELECT COUNT(DISTINCT e.usuarioId) FROM Evidencia e WHERE e.ponto.id = :pontoId AND e.validada = true")
     Long countUsuariosValidadosByPontoId(String pontoId);
 
-    boolean existsByPontoIdAndUsuarioId(String pontoId, String usuarioId);
-}
+    /**
+     * Conta usuarios validados distintos para VARIOS pontos de uma 

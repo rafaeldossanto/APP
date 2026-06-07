@@ -2,6 +2,7 @@ package com.app.APP.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -30,12 +31,9 @@ public class ParticipanteAventura {
     @Id
     private String id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "aventura_id", nullable = false)
     private Aventura aventura;
 
     @Column(name = "usuario_id", nullable = false)
-    private String usuarioId;
-
-    private LocalDateTime entradoEm;
-}
+    priva

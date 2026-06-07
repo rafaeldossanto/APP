@@ -6,13 +6,4 @@ import jakarta.validation.constraints.NotNull;
 
 /**
  * Adicao de evidencia a um ponto. As coordenadas de captura sao obrigatorias —
- * o service valida que estao a menos de 50m do ponto. tipoEvidencia e opcional.
- */
-public record EvidenciaRequest(
-        @NotBlank String pontoId,
-        @NotBlank String usuarioId,
-        @NotBlank String fotoUrl,
-        TipoEvidencia tipoEvidencia,
-        @NotNull Double latCaptura,
-        @NotNull Double lngCaptura
-) {}
+ * o service valida que estao 

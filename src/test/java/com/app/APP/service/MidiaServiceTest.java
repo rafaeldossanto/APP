@@ -17,6 +17,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -102,26 +106,28 @@ class MidiaServiceTest {
     }
 
     @Test
-    @DisplayName("getByAventura deve mapear lista")
+    @DisplayName("getByAventura deve mapear pagina")
     void deveListarPorAventura() {
-        when(midiaRepository.findByAventuraId(AventuraStub.ID))
-                .thenReturn(List.of(MidiaStub.umaMidia().build()));
+        Pageable pageable = PageRequest.of(0, 10);
+        when(midiaRepository.findByAventuraId(AventuraStub.ID, pageable))
+                .thenReturn(new PageImpl<>(List.of(MidiaStub.umaMidia().build())));
 
-        List<MidiaResponse> response = service.getByAventura(AventuraStub.ID);
+        Page<MidiaResponse> response = service.getByAventura(AventuraStub.ID, pageable);
 
-        assertThat(response).hasSize(1);
-        assertThat(response.get(0).aventuraId()).isEqualTo(AventuraStub.ID);
+        assertThat(response.getContent()).hasSize(1);
+        assertThat(response.getContent().get(0).aventuraId()).isEqualTo(AventuraStub.ID);
     }
 
     @Test
-    @DisplayName("getByCaminho deve mapear lista")
+    @DisplayName("getByCaminho deve mapear pagina")
     void deveListarPorCaminho() {
-        when(midiaRepository.findByCaminhoId(CaminhoStub.ID))
-                .thenReturn(List.of(MidiaStub.umaMidia().build()));
+        Pageable pageable = PageRequest.of(0, 10);
+        when(midiaRepository.findByCaminhoId(CaminhoStub.ID, pageable))
+                .thenReturn(new PageImpl<>(List.of(MidiaStub.umaMidia().build())));
 
-        List<MidiaResponse> response = service.getByCaminho(CaminhoStub.ID);
+        Page<MidiaResponse> response = service.getByCaminho(CaminhoStub.ID, pageable);
 
-        assertThat(response).hasSize(1);
+        assertThat(response.getContent()).hasSize(1);
     }
 
     @Test
@@ -132,16 +138,4 @@ class MidiaServiceTest {
 
         service.delete(MidiaStub.ID);
 
-        verify(midiaRepository).delete(midia);
-    }
-
-    @Test
-    @DisplayName("delete deve falhar quando midia nao existe")
-    void deveFalharDeletarInexistente() {
-        when(midiaRepository.findById("inexistente")).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> service.delete("inexistente"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Midia nao encontrada");
-    }
-}
+        verify(midiaRepository).delete(mi

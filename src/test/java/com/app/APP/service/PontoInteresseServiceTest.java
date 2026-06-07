@@ -18,6 +18,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -136,15 +140,9 @@ class PontoInteresseServiceTest {
     }
 
     @Test
-    @DisplayName("getByCaminho deve mapear e calcular nivel de cada ponto")
+    @DisplayName("getByCaminho deve paginar, mapear e calcular nivel via contagem em lote")
     void deveListarPorCaminho() {
+        Pageable pageable = PageRequest.of(0, 10);
         PontoInteresse ponto = PontoInteresseStub.umPonto().build();
-        when(pontoRepository.findByCaminhoId(CaminhoStub.ID)).thenReturn(List.of(ponto));
-        when(evidenciaRepository.countUsuariosValidadosByPontoId(ponto.getId())).thenReturn(1L);
-
-        List<PontoInteresseResponse> response = service.getByCaminho(CaminhoStub.ID);
-
-        assertThat(response).hasSize(1);
-        assertThat(response.get(0).nivelConfianca()).isEqualTo(3);
-    }
-}
+        when(pontoRepository.findByCaminhoId(CaminhoStub.ID, pageable))
+                .thenReturn(new PageImpl<>(List.of(ponto)

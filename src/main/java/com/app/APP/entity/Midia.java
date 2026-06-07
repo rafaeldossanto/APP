@@ -5,7 +5,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -18,7 +20,10 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "midias")
+@Table(name = "midias", indexes = {
+        @Index(name = "idx_midia_aventura", columnList = "aventura_id"),
+        @Index(name = "idx_midia_caminho", columnList = "caminho_id")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,12 +34,12 @@ public class Midia {
     @Id
     private String id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "aventura_id", nullable = false)
     private Aventura aventura;
 
     // nullable — se nulo, midia é avulsa na aventura
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "caminho_id")
     private Caminho caminho;
 
@@ -43,15 +48,4 @@ public class Midia {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TipoMidia tipo;
-
-    @Column(nullable = false)
-    private String url;
-
-    private Double latCaptura;
-    private Double lngCaptura;
-    private Double distanciaNaCapturaKm;
-    private Double percentualNoCaminho; // ex: 0.20 = 20%
-
-    private LocalDateTime capturadaEm;
-}
+    private Ti

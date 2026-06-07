@@ -9,10 +9,11 @@ import com.app.APP.repository.AventuraRepository;
 import com.app.APP.repository.CaminhoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static com.app.APP.mapper.CaminhoMapper.toResponse;
 
@@ -46,20 +47,16 @@ public class CaminhoService {
         return toResponse(caminhoRepository.save(caminho));
     }
 
-    public List<CaminhoResponse> getByAventura(String aventuraId) {
-        return caminhoRepository.findByAventuraId(aventuraId)
-                .stream().map(CaminhoMapper::toResponse).toList();
+    public Page<CaminhoResponse> getByAventura(String aventuraId, Pageable pageable) {
+        return caminhoRepository.findByAventuraId(aventuraId, pageable)
+                .map(CaminhoMapper::toResponse);
     }
 
-    public List<CaminhoResponse> getByUsuario(String usuarioId) {
-        return caminhoRepository.findByUsuarioId(usuarioId)
-                .stream().map(CaminhoMapper::toResponse).toList();
+    public Page<CaminhoResponse> getByUsuario(String usuarioId, Pageable pageable) {
+        return caminhoRepository.findByUsuarioId(usuarioId, pageable)
+                .map(CaminhoMapper::toResponse);
     }
 
     private Caminho findById(String id) {
         return caminhoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Caminho nao encontrado"));
-    }
-
-
-}
+           
