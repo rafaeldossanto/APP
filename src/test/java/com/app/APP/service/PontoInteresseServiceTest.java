@@ -148,7 +148,7 @@ class PontoInteresseServiceTest {
                 .thenReturn(new PageImpl<>(List.of(ponto)));
         // contagem em lote: [pontoId, total] — 1 usuario validado para o ponto
         when(evidenciaRepository.countUsuariosValidadosPorPontos(List.of(ponto.getId())))
-                .thenReturn((List<Object[]>) List.of(new Object[]{ponto.getId(), 1L}));
+                .thenReturn(List.<Object[]>of(new Object[]{ponto.getId(), 1L}));
 
         Page<PontoInteresseResponse> response = service.getByCaminho(CaminhoStub.ID, pageable);
 
