@@ -109,4 +109,13 @@ class CaminhoServiceTest {
 
     @Test
     @DisplayName("getByUsuario deve mapear pagina")
-    v
+    void deveListarPorUsuario() {
+        Pageable pageable = PageRequest.of(0, 10);
+        when(caminhoRepository.findByUsuarioId(CaminhoStub.USUARIO_ID, pageable))
+                .thenReturn(new PageImpl<>(List.of(CaminhoStub.umCaminho().build())));
+
+        Page<CaminhoResponse> response = service.getByUsuario(CaminhoStub.USUARIO_ID, pageable);
+
+        assertThat(response.getContent()).hasSize(1);
+    }
+}

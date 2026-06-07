@@ -36,4 +36,7 @@ public class ParticipanteAventura {
     private Aventura aventura;
 
     @Column(name = "usuario_id", nullable = false)
-    priva
+    private String usuarioId;
+
+    private LocalDateTime entradoEm;
+}

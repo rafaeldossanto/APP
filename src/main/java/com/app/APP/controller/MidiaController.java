@@ -39,4 +39,6 @@ public class MidiaController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable String id) {
-     
+        midiaService.delete(id);
+    }
+}

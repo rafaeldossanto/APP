@@ -48,4 +48,15 @@ public class Midia {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Ti
+    private TipoMidia tipo;
+
+    @Column(nullable = false)
+    private String url;
+
+    private Double latCaptura;
+    private Double lngCaptura;
+    private Double distanciaNaCapturaKm;
+    private Double percentualNoCaminho; // ex: 0.20 = 20%
+
+    private LocalDateTime capturadaEm;
+}

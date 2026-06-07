@@ -38,4 +38,14 @@ public class Caminho {
     @JoinColumn(name = "aventura_id", nullable = false)
     private Aventura aventura;
 
-    @
+    @Column(nullable = false)
+    private String usuarioId;
+
+    @Builder.Default
+    private Cores cor = ROXO;
+    private Integer numero;
+
+    private LocalDateTime iniciadoEm;
+    private LocalDateTime finalizadoEm;
+    private Double distanciaTotalKm;
+}

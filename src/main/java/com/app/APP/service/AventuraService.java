@@ -81,4 +81,9 @@ public class AventuraService {
     }
 
     private Aventura findById(String id) {
-        r
+        return aventuraRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Aventura nao encontrada"));
+    }
+
+
+}

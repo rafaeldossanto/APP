@@ -40,4 +40,7 @@ public class CaminhoController {
     }
 
     @GetMapping("/usuario/{usuarioId}")
-    public Page<CaminhoResponse> getByUsuari
+    public Page<CaminhoResponse> getByUsuario(@PathVariable String usuarioId, Pageable pageable) {
+        return caminhoService.getByUsuario(usuarioId, pageable);
+    }
+}

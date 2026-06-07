@@ -42,3 +42,5 @@ public class MidiaMapper {
                 .distanciaNaCapturaKm(midia.getDistanciaNaCapturaKm())
                 .capturadaEm(midia.getCapturadaEm())
                 .build();
+    }
+}

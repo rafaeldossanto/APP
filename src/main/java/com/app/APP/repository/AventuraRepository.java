@@ -11,4 +11,6 @@ import java.util.List;
 
 @Repository
 public interface AventuraRepository extends JpaRepository<Aventura, String> {
-    Page<Aventura> findByUsuarioId(String usuar
+    Page<Aventura> findByUsuarioId(String usuarioId, Pageable pageable);
+    List<Aventura> findByUsuarioIdAndStatus(String usuarioId, StatusAventura status);
+}

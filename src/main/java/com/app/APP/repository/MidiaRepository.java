@@ -12,4 +12,6 @@ import java.util.List;
 @Repository
 public interface MidiaRepository extends JpaRepository<Midia, String> {
     Page<Midia> findByAventuraId(String aventuraId, Pageable pageable);
-    Page<Midia>
+    Page<Midia> findByCaminhoId(String caminhoId, Pageable pageable);
+    List<Midia> findByAventuraIdAndTipo(String aventuraId, TipoMidia tipo);
+}

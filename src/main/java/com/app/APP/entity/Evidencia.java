@@ -51,4 +51,12 @@ public class Evidencia {
     private Double distanciaDopontoM;
 
     @Column(nullable = false)
-    @Builder.Def
+    @Builder.Default
+    private Boolean capturadaNoApp = false;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean validada = false;
+
+    private LocalDateTime criadoEm;
+}

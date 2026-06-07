@@ -45,4 +45,13 @@ public class PontoInteresse {
     private TipoPonto tipo;
 
     private String nome;
-    private S
+    private String descricao;
+
+    @Column(nullable = false)
+    private Double latitude;
+
+    @Column(nullable = false)
+    private Double longitude;
+
+    private LocalDateTime criadoEm;
+}

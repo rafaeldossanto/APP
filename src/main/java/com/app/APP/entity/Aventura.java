@@ -50,4 +50,10 @@ public class Aventura {
     private StatusAventura status = StatusAventura.PLANEJADA;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = fal
+    @Column(nullable = false)
+    @Builder.Default
+    private VisibilidadeAventura visibilidade = VisibilidadeAventura.PRIVADA;
+
+    private LocalDateTime criadoEm;
+    private LocalDateTime atualizadoEm;
+}

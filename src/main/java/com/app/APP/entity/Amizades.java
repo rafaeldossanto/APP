@@ -40,4 +40,13 @@ public class Amizades {
     private String solicitanteId;
 
     @Column(name = "receptor_id", nullable = false)
-    private String recept
+    private String receptorId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private StatusAmizade status = StatusAmizade.PENDENTE;
+
+    private LocalDateTime solicitadoEm;
+    private LocalDateTime respondidoEm;
+}

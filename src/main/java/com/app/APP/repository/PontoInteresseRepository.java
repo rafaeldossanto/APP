@@ -11,4 +11,6 @@ import java.util.List;
 
 @Repository
 public interface PontoInteresseRepository extends JpaRepository<PontoInteresse, String> {
-    Page<PontoInteresse> findByCaminhoId(String cami
+    Page<PontoInteresse> findByCaminhoId(String caminhoId, Pageable pageable);
+    List<PontoInteresse> findByCaminhoIdAndTipo(String caminhoId, TipoPonto tipo);
+}

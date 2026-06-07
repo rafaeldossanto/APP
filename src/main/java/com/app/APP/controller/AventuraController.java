@@ -52,4 +52,8 @@ public class AventuraController {
         aventuraService.adicionarParticipante(id, usuarioId);
     }
 
-    @DeleteMapping("/{i
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable String id) {
+        aventuraService.delete(id);
+    }
+}

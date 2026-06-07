@@ -156,4 +156,13 @@ class AventuraServiceTest {
     }
 
     @Test
-    @DisplayName("delete deve remover
+    @DisplayName("delete deve remover aventura existente")
+    void deveDeletar() {
+        Aventura aventura = AventuraStub.umaAventura().build();
+        when(aventuraRepository.findById(AventuraStub.ID)).thenReturn(Optional.of(aventura));
+
+        service.delete(AventuraStub.ID);
+
+        verify(aventuraRepository).delete(aventura);
+    }
+}

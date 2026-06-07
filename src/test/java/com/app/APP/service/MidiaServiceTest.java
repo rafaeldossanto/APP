@@ -138,4 +138,16 @@ class MidiaServiceTest {
 
         service.delete(MidiaStub.ID);
 
-        verify(midiaRepository).delete(mi
+        verify(midiaRepository).delete(midia);
+    }
+
+    @Test
+    @DisplayName("delete deve falhar quando midia nao existe")
+    void deveFalharDeletarInexistente() {
+        when(midiaRepository.findById("inexistente")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.delete("inexistente"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Midia nao encontrada");
+    }
+}

@@ -145,4 +145,14 @@ class PontoInteresseServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         PontoInteresse ponto = PontoInteresseStub.umPonto().build();
         when(pontoRepository.findByCaminhoId(CaminhoStub.ID, pageable))
-                .thenReturn(new PageImpl<>(List.of(ponto)
+                .thenReturn(new PageImpl<>(List.of(ponto)));
+        // contagem em lote: [pontoId, total] — 1 usuario validado para o ponto
+        when(evidenciaRepository.countUsuariosValidadosPorPontos(List.of(ponto.getId())))
+                .thenReturn((List<Object[]>) List.of(new Object[]{ponto.getId(), 1L}));
+
+        Page<PontoInteresseResponse> response = service.getByCaminho(CaminhoStub.ID, pageable);
+
+        assertThat(response.getContent()).hasSize(1);
+        assertThat(response.getContent().get(0).nivelConfianca()).isEqualTo(3);
+    }
+}

@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CaminhoRepository extends JpaRepository<Caminho, String> {
-    Page<Caminho> findByAventuraId(String
+    Page<Caminho> findByAventuraId(String aventuraId, Pageable pageable);
+    Page<Caminho> findByUsuarioId(String usuarioId, Pageable pageable);
+}

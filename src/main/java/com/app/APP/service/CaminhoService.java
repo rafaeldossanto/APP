@@ -59,4 +59,8 @@ public class CaminhoService {
 
     private Caminho findById(String id) {
         return caminhoRepository.findById(id)
-           
+                .orElseThrow(() -> new IllegalArgumentException("Caminho nao encontrado"));
+    }
+
+
+}

@@ -39,4 +39,7 @@ public class PontoInteresseController {
     }
 
     @PostMapping("/evidencia")
-    public EvidenciaResponse adicionarEvidencia(@RequestBody @Valid Evi
+    public EvidenciaResponse adicionarEvidencia(@RequestBody @Valid EvidenciaRequest request) {
+        return pontoInteresseService.adicionarEvidencia(request);
+    }
+}
