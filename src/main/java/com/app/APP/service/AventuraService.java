@@ -1,7 +1,6 @@
 package com.app.APP.service;
 
 import com.app.APP.entity.Aventura;
-import com.app.APP.entity.ParticipanteAventura;
 import com.app.APP.entity.Regiao;
 import com.app.APP.mapper.AventuraMapper;
 import com.app.APP.mapper.ParticipanteMapper;

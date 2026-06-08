@@ -23,9 +23,6 @@ import static com.app.APP.mapper.AmizadeMapper.toResponse;
 @Slf4j
 public class AmizadeService {
 
-    //todo - amizade esta simples tem que fazer apenas os processos de amizade
-    //todo - tendo como obgetivo mostrar as amizades vinculadas ao id do usuario
-
     private final AmizadesRepository amizadesRepository;
     private final UsuarioRepository usuarioRepository;
 

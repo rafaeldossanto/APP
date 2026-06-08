@@ -22,8 +22,6 @@ import static com.app.APP.mapper.CaminhoMapper.toResponse;
 @Slf4j
 public class CaminhoService {
 
-    //todo - organizar o esquema de caminho
-
     private final CaminhoRepository caminhoRepository;
     private final AventuraRepository aventuraRepository;
 
@@ -35,7 +33,6 @@ public class CaminhoService {
 
         return toResponse(caminhoRepository.save(CaminhoMapper.toEntity(request, aventura)));
     }
-
 
     public CaminhoResponse finalizar(String id, Double distanciaTotalKm) {
         log.info("Finalizando caminho: {}", id);

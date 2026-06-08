@@ -9,11 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * Busca de usuarios pelo codigoUsuario publico (ex.: "rafael#1"), para o fluxo
- * de adicionar amigos. Expoe apenas dados publicos (nome + codigo), nunca email
- * nem id interno.
- */
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -23,17 +19,12 @@ public class UsuarioBuscaService {
 
     private final UsuarioRepository usuarioRepository;
 
-    /** Busca exata: usada quando o usuario digita o codigo completo do amigo. */
     public UsuarioPublicoResponse buscarPorCodigo(String codigoUsuario) {
         Usuario usuario = usuarioRepository.findByCodigoUsuario(codigoUsuario)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado"));
         return toPublico(usuario);
     }
 
-    /**
-     * Autocomplete: lista usuarios cujo codigo comeca pelo termo digitado,
-     * limitado para nao retornar a base inteira.
-     */
     public List<UsuarioPublicoResponse> autocomplete(String termo) {
         return usuarioRepository.buscarPorPrefixoCodigo(termo).stream()
                 .limit(LIMITE_AUTOCOMPLETE)

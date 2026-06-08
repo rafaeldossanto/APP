@@ -12,14 +12,8 @@ import java.util.Optional;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, String> {
 
-    /** Busca exata por codigoUsuario (ex.: "rafael#1") — usada para adicionar amigo. */
     Optional<Usuario> findByCodigoUsuario(String codigoUsuario);
 
-    /**
-     * Busca por prefixo do codigoUsuario para autocomplete ("digite o codigo do
-     * amigo"). Case-insensitive; o service limita a quantidade para nao varrer a
-     * base toda.
-     */
     @Query("SELECT u FROM Usuario u WHERE LOWER(u.codigoUsuario) LIKE LOWER(CONCAT(:termo, '%'))")
     List<Usuario> buscarPorPrefixoCodigo(@Param("termo") String termo);
 }

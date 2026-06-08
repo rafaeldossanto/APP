@@ -77,8 +77,6 @@ public class PontoInteresseService {
     public Page<PontoInteresseResponse> getByCaminho(String caminhoId, Pageable pageable) {
         Page<PontoInteresse> pagina = pontoRepository.findByCaminhoId(caminhoId, pageable);
 
-        // Conta os usuarios validados dos pontos DA PAGINA em uma unica query
-        // (evita o N+1 de chamar countUsuariosValidadosByPontoId por ponto).
         Map<String, Long> validadosPorPonto = contarValidadosEmLote(pagina.getContent());
 
         return pagina.map(p -> PontoInteresseMapper.toResponse(
