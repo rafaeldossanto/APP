@@ -49,4 +49,8 @@ public class Amizades {
 
     private LocalDateTime solicitadoEm;
     private LocalDateTime respondidoEm;
+
+    /** Quem efetuou o bloqueio (preenchido apenas quando status = BLOQUEADA). */
+    @Column(name = "bloqueado_por")
+    private String bloqueadoPor;
 }

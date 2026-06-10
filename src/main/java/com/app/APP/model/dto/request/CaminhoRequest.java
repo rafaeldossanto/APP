@@ -4,12 +4,12 @@ import com.app.APP.model.enums.Cores;
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * Inicio de caminho. Cor (default ROXO) e numero sao opcionais; aventura e
- * usuario sao obrigatorios.
+ * Inicio de caminho. Aventura e usuario sao obrigatorios; cor e opcional
+ * (default ROXO). O numero do caminho NAO vem do cliente — e gerado de forma
+ * sequencial por aventura no service.
  */
 public record CaminhoRequest(
         @NotBlank String aventuraId,
         @NotBlank String usuarioId,
-        Cores cor,
-        Integer numero
+        Cores cor
 ) {}

@@ -13,6 +13,7 @@ public class AmizadeMapper {
                 .solicitanteId(a.getSolicitanteId())
                 .receptorId(a.getReceptorId())
                 .status(a.getStatus())
+                .bloqueadoPor(a.getBloqueadoPor())
                 .solicitadoEm(a.getSolicitadoEm())
                 .respondidoEm(a.getRespondidoEm())
                 .build();

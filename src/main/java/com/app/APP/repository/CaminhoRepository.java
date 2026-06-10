@@ -10,4 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface CaminhoRepository extends JpaRepository<Caminho, String> {
     Page<Caminho> findByAventuraId(String aventuraId, Pageable pageable);
     Page<Caminho> findByUsuarioId(String usuarioId, Pageable pageable);
+
+    /** Quantos caminhos a aventura ja tem — base do numero sequencial do proximo. */
+    int countByAventuraId(String aventuraId);
 }

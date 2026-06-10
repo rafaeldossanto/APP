@@ -29,6 +29,6 @@ public final class CaminhoStub {
     }
 
     public static CaminhoRequest umRequest() {
-        return new CaminhoRequest(AventuraStub.ID, USUARIO_ID, Cores.ROXO, NUMERO);
+        return new CaminhoRequest(AventuraStub.ID, USUARIO_ID, Cores.ROXO);
     }
 }

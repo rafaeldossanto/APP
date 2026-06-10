@@ -11,6 +11,7 @@ public record AmizadeResponse(
         String solicitanteId,
         String receptorId,
         StatusAmizade status,
+        String bloqueadoPor,
         LocalDateTime solicitadoEm,
         LocalDateTime respondidoEm
 ) {}

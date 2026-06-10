@@ -11,6 +11,7 @@ import com.app.APP.stub.CaminhoStub;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -49,13 +50,17 @@ class CaminhoServiceTest {
         Caminho salvo = CaminhoStub.umCaminho().build();
 
         when(aventuraRepository.findById(request.aventuraId())).thenReturn(Optional.of(aventura));
+        when(caminhoRepository.countByAventuraId(request.aventuraId())).thenReturn(2);
         when(caminhoRepository.save(any(Caminho.class))).thenReturn(salvo);
 
         CaminhoResponse response = service.iniciar(request);
 
         assertThat(response.id()).isEqualTo(salvo.getId());
         assertThat(response.usuarioId()).isEqualTo(CaminhoStub.USUARIO_ID);
-        verify(caminhoRepository).save(any(Caminho.class));
+
+        ArgumentCaptor<Caminho> captor = ArgumentCaptor.forClass(Caminho.class);
+        verify(caminhoRepository).save(captor.capture());
+        assertThat(captor.getValue().getNumero()).isEqualTo(3); // count(2) + 1
     }
 
     @Test

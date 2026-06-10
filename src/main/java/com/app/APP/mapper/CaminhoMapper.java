@@ -11,12 +11,12 @@ import java.time.LocalDateTime;
 @UtilityClass
 public class CaminhoMapper {
 
-    public static Caminho toEntity(CaminhoRequest request, Aventura aventura) {
+    public static Caminho toEntity(CaminhoRequest request, Aventura aventura, int numero) {
         return Caminho.builder()
                 .aventura(aventura)
                 .usuarioId(request.usuarioId())
                 .cor(request.cor())
-                .numero(request.numero())
+                .numero(numero)
                 .iniciadoEm(LocalDateTime.now())
                 .build();
     }
