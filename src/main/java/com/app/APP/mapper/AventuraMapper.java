@@ -13,9 +13,9 @@ import static java.util.Objects.nonNull;
 @UtilityClass
 public class AventuraMapper {
 
-    public static Aventura toEntity(AventuraRequest request, Regiao regiao) {
+    public static Aventura toEntity(AventuraRequest request, Regiao regiao, String usuarioId) {
         return Aventura.builder()
-                .usuarioId(request.usuarioId())
+                .usuarioId(usuarioId)
                 .regiao(regiao)
                 .destino(request.destino())
                 .visibilidade(request.visibilidade())

@@ -1,5 +1,6 @@
 package com.app.APP.controller;
 
+import com.app.APP.auth.UsuarioAutenticado;
 import com.app.APP.model.dto.request.MidiaRequest;
 import com.app.APP.model.dto.response.MidiaResponse;
 import com.app.APP.service.MidiaService;
@@ -23,8 +24,8 @@ public class MidiaController {
     private final MidiaService midiaService;
 
     @PostMapping
-    public MidiaResponse salvar(@RequestBody @Valid MidiaRequest request) {
-        return midiaService.salvar(request);
+    public MidiaResponse salvar(UsuarioAutenticado usuario, @RequestBody @Valid MidiaRequest request) {
+        return midiaService.salvar(usuario.id(), request);
     }
 
     @GetMapping("/aventura/{aventuraId}")
@@ -38,7 +39,7 @@ public class MidiaController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable String id) {
-        midiaService.delete(id);
+    public void delete(UsuarioAutenticado usuario, @PathVariable String id) {
+        midiaService.delete(usuario.id(), id);
     }
 }

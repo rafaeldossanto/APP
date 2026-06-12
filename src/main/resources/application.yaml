@@ -23,6 +23,13 @@ spring:
     enabled: true
     baseline-on-migrate: true
 
+  # Resource server: valida o Bearer da app pela chave publica do Cadastro (JWKS).
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${JWKS_URI:http://localhost:8080/oauth2/jwks}
+
 server:
   port: 8081
 

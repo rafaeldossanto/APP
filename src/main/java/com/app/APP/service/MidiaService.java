@@ -26,7 +26,7 @@ public class MidiaService {
     private final AventuraRepository aventuraRepository;
     private final CaminhoRepository caminhoRepository;
 
-    public MidiaResponse salvar(MidiaRequest request) {
+    public MidiaResponse salvar(String usuarioId, MidiaRequest request) {
         log.info("Salvando midia tipo: {} na aventura: {}", request.tipo(), request.aventuraId());
 
         Aventura aventura = aventuraRepository.findById(request.aventuraId())
@@ -38,7 +38,7 @@ public class MidiaService {
                     .orElseThrow(() -> new IllegalArgumentException("Caminho nao encontrado"));
         }
 
-        Midia midia = midiaRepository.save(MidiaMapper.toEntity(request, aventura, caminho));
+        Midia midia = midiaRepository.save(MidiaMapper.toEntity(request, aventura, caminho, usuarioId));
 
         return MidiaMapper.toResponse(midia);
     }
@@ -53,9 +53,14 @@ public class MidiaService {
                 .map(MidiaMapper::toResponse);
     }
 
-    public void delete(String id) {
+    public void delete(String usuarioId, String id) {
         Midia midia = midiaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Midia nao encontrada"));
+
+        if (!usuarioId.equals(midia.getUsuarioId())) {
+            throw new IllegalArgumentException("Voce nao e o dono desta midia");
+        }
+
         midiaRepository.delete(midia);
         log.info("Midia {} deletada", id);
     }

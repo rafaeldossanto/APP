@@ -1,5 +1,6 @@
 package com.app.APP.controller;
 
+import com.app.APP.auth.UsuarioAutenticado;
 import com.app.APP.model.dto.request.EvidenciaRequest;
 import com.app.APP.model.dto.request.PontoInteresseRequest;
 import com.app.APP.model.dto.response.EvidenciaResponse;
@@ -24,8 +25,8 @@ public class PontoInteresseController {
     private final PontoInteresseService pontoInteresseService;
 
     @PostMapping
-    public PontoInteresseResponse create(@RequestBody @Valid PontoInteresseRequest request) {
-        return pontoInteresseService.create(request);
+    public PontoInteresseResponse create(UsuarioAutenticado usuario, @RequestBody @Valid PontoInteresseRequest request) {
+        return pontoInteresseService.create(usuario.id(), request);
     }
 
     @GetMapping("/{id}")
@@ -39,7 +40,7 @@ public class PontoInteresseController {
     }
 
     @PostMapping("/evidencia")
-    public EvidenciaResponse adicionarEvidencia(@RequestBody @Valid EvidenciaRequest request) {
-        return pontoInteresseService.adicionarEvidencia(request);
+    public EvidenciaResponse adicionarEvidencia(UsuarioAutenticado usuario, @RequestBody @Valid EvidenciaRequest request) {
+        return pontoInteresseService.adicionarEvidencia(usuario.id(), request);
     }
 }

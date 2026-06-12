@@ -28,6 +28,6 @@ public final class AmizadeStub {
     }
 
     public static AmizadeRequest umRequest() {
-        return new AmizadeRequest(SOLICITANTE_ID, RECEPTOR_ID);
+        return new AmizadeRequest(RECEPTOR_ID);
     }
 }

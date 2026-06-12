@@ -56,7 +56,7 @@ class AventuraServiceTest {
         when(regiaoRepository.findById(request.regiaoId())).thenReturn(Optional.of(regiao));
         when(aventuraRepository.save(any(Aventura.class))).thenReturn(salva);
 
-        AventuraResponse response = service.create(request);
+        AventuraResponse response = service.create(AventuraStub.USUARIO_ID, request);
 
         assertThat(response.id()).isEqualTo(salva.getId());
         assertThat(response.destino()).isEqualTo(salva.getDestino());
@@ -70,7 +70,7 @@ class AventuraServiceTest {
         AventuraRequest request = AventuraStub.umRequest();
         when(regiaoRepository.findById(request.regiaoId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.create(request))
+        assertThatThrownBy(() -> service.create(AventuraStub.USUARIO_ID, request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("regiao nao encontrada");
 
@@ -119,7 +119,7 @@ class AventuraServiceTest {
         when(aventuraRepository.findById(AventuraStub.ID)).thenReturn(Optional.of(aventura));
         when(aventuraRepository.save(any(Aventura.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        AventuraResponse response = service.atualizarStatus(AventuraStub.ID, StatusAventura.CONCLUIDA);
+        AventuraResponse response = service.atualizarStatus(AventuraStub.USUARIO_ID, AventuraStub.ID, StatusAventura.CONCLUIDA);
 
         assertThat(response.status()).isEqualTo(StatusAventura.CONCLUIDA);
         assertThat(aventura.getAtualizadoEm()).isNotNull();
@@ -161,7 +161,7 @@ class AventuraServiceTest {
         Aventura aventura = AventuraStub.umaAventura().build();
         when(aventuraRepository.findById(AventuraStub.ID)).thenReturn(Optional.of(aventura));
 
-        service.delete(AventuraStub.ID);
+        service.delete(AventuraStub.USUARIO_ID, AventuraStub.ID);
 
         verify(aventuraRepository).delete(aventura);
     }

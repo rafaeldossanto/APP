@@ -7,11 +7,10 @@ import jakarta.validation.constraints.NotNull;
 /**
  * Criacao de ponto de interesse. Nome e descricao sao opcionais (a descricao,
  * inclusive, eleva o nivel de confianca, mas nao e obrigatoria). Coordenadas
- * e tipo identificam o ponto e sao obrigatorios.
+ * e tipo identificam o ponto e sao obrigatorios. O autor vem do token.
  */
 public record PontoInteresseRequest(
         @NotBlank String caminhoId,
-        @NotBlank String usuarioId,
         @NotNull TipoPonto tipo,
         String nome,
         String descricao,

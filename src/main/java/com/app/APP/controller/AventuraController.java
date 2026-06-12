@@ -1,5 +1,6 @@
 package com.app.APP.controller;
 
+import com.app.APP.auth.UsuarioAutenticado;
 import com.app.APP.model.dto.request.AventuraRequest;
 import com.app.APP.model.dto.response.AventuraResponse;
 import com.app.APP.model.enums.StatusAventura;
@@ -26,8 +27,8 @@ public class AventuraController {
     private final AventuraService aventuraService;
 
     @PostMapping
-    public AventuraResponse create(@RequestBody @Valid AventuraRequest request) {
-        return aventuraService.create(request);
+    public AventuraResponse create(UsuarioAutenticado usuario, @RequestBody @Valid AventuraRequest request) {
+        return aventuraService.create(usuario.id(), request);
     }
 
     @GetMapping("/{id}")
@@ -41,9 +42,10 @@ public class AventuraController {
     }
 
     @PatchMapping("/{id}/status")
-    public AventuraResponse atualizarStatus(@PathVariable String id,
+    public AventuraResponse atualizarStatus(UsuarioAutenticado usuario,
+                                            @PathVariable String id,
                                             @RequestParam StatusAventura status) {
-        return aventuraService.atualizarStatus(id, status);
+        return aventuraService.atualizarStatus(usuario.id(), id, status);
     }
 
     @PostMapping("/{id}/participante")
@@ -53,7 +55,7 @@ public class AventuraController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable String id) {
-        aventuraService.delete(id);
+    public void delete(UsuarioAutenticado usuario, @PathVariable String id) {
+        aventuraService.delete(usuario.id(), id);
     }
 }

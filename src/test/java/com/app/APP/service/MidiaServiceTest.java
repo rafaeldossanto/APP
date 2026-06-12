@@ -56,7 +56,7 @@ class MidiaServiceTest {
         when(caminhoRepository.findById(request.caminhoId())).thenReturn(Optional.of(caminho));
         when(midiaRepository.save(any(Midia.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        MidiaResponse response = service.salvar(request);
+        MidiaResponse response = service.salvar(MidiaStub.USUARIO_ID, request);
 
         assertThat(response.url()).isEqualTo(request.url());
         assertThat(response.caminhoId()).isEqualTo(CaminhoStub.ID);
@@ -71,7 +71,7 @@ class MidiaServiceTest {
         when(aventuraRepository.findById(request.aventuraId())).thenReturn(Optional.of(aventura));
         when(midiaRepository.save(any(Midia.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        MidiaResponse response = service.salvar(request);
+        MidiaResponse response = service.salvar(MidiaStub.USUARIO_ID, request);
 
         assertThat(response.caminhoId()).isNull();
         verify(caminhoRepository, never()).findById(any());
@@ -83,7 +83,7 @@ class MidiaServiceTest {
         MidiaRequest request = MidiaStub.umRequest();
         when(aventuraRepository.findById(request.aventuraId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.salvar(request))
+        assertThatThrownBy(() -> service.salvar(MidiaStub.USUARIO_ID, request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Aventura nao encontrada");
 
@@ -98,7 +98,7 @@ class MidiaServiceTest {
         when(aventuraRepository.findById(request.aventuraId())).thenReturn(Optional.of(aventura));
         when(caminhoRepository.findById(request.caminhoId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.salvar(request))
+        assertThatThrownBy(() -> service.salvar(MidiaStub.USUARIO_ID, request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Caminho nao encontrado");
 
@@ -136,7 +136,7 @@ class MidiaServiceTest {
         Midia midia = MidiaStub.umaMidia().build();
         when(midiaRepository.findById(MidiaStub.ID)).thenReturn(Optional.of(midia));
 
-        service.delete(MidiaStub.ID);
+        service.delete(MidiaStub.USUARIO_ID, MidiaStub.ID);
 
         verify(midiaRepository).delete(midia);
     }
@@ -146,7 +146,7 @@ class MidiaServiceTest {
     void deveFalharDeletarInexistente() {
         when(midiaRepository.findById("inexistente")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.delete("inexistente"))
+        assertThatThrownBy(() -> service.delete(MidiaStub.USUARIO_ID, "inexistente"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Midia nao encontrada");
     }

@@ -55,7 +55,7 @@ class PontoInteresseServiceTest {
         when(caminhoRepository.findById(request.caminhoId())).thenReturn(Optional.of(caminho));
         when(pontoRepository.save(any(PontoInteresse.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        PontoInteresseResponse response = service.create(request);
+        PontoInteresseResponse response = service.create(PontoInteresseStub.USUARIO_ID, request);
 
         assertThat(response.nome()).isEqualTo(request.nome());
         assertThat(response.tipo()).isEqualTo(request.tipo());
@@ -68,7 +68,7 @@ class PontoInteresseServiceTest {
         PontoInteresseRequest request = PontoInteresseStub.umRequest();
         when(caminhoRepository.findById(request.caminhoId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.create(request))
+        assertThatThrownBy(() -> service.create(PontoInteresseStub.USUARIO_ID, request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Caminho nao encontrado");
 
@@ -83,7 +83,7 @@ class PontoInteresseServiceTest {
         when(pontoRepository.findById(request.pontoId())).thenReturn(Optional.of(ponto));
         when(evidenciaRepository.save(any(Evidencia.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        EvidenciaResponse response = service.adicionarEvidencia(request);
+        EvidenciaResponse response = service.adicionarEvidencia(PontoInteresseStub.USUARIO_ID, request);
 
         assertThat(response.validada()).isTrue();
         assertThat(response.pontoId()).isEqualTo(ponto.getId());
@@ -97,7 +97,7 @@ class PontoInteresseServiceTest {
         EvidenciaRequest request = PontoInteresseStub.umRequestEvidenciaLonge();
         when(pontoRepository.findById(request.pontoId())).thenReturn(Optional.of(ponto));
 
-        assertThatThrownBy(() -> service.adicionarEvidencia(request))
+        assertThatThrownBy(() -> service.adicionarEvidencia(PontoInteresseStub.USUARIO_ID, request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("muito longe");
 
@@ -110,7 +110,7 @@ class PontoInteresseServiceTest {
         EvidenciaRequest request = PontoInteresseStub.umRequestEvidenciaProxima();
         when(pontoRepository.findById(request.pontoId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.adicionarEvidencia(request))
+        assertThatThrownBy(() -> service.adicionarEvidencia(PontoInteresseStub.USUARIO_ID, request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Ponto nao encontrado");
     }

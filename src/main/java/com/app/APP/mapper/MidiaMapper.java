@@ -15,12 +15,12 @@ import static java.util.Objects.nonNull;
 @UtilityClass
 public class MidiaMapper {
 
-    public static Midia toEntity(MidiaRequest request, Aventura aventura, Caminho caminho) {
+    public static Midia toEntity(MidiaRequest request, Aventura aventura, Caminho caminho, String usuarioId) {
         return Midia.builder()
                 .id(UUID.randomUUID().toString())
                 .aventura(aventura)
                 .caminho(caminho)
-                .usuarioId(request.usuarioId())
+                .usuarioId(usuarioId)
                 .tipo(request.tipo())
                 .url(request.url())
                 .latCaptura(request.latCaptura())

@@ -1,5 +1,6 @@
 package com.app.APP.controller;
 
+import com.app.APP.auth.UsuarioAutenticado;
 import com.app.APP.model.dto.request.CaminhoRequest;
 import com.app.APP.model.dto.response.CaminhoResponse;
 import com.app.APP.service.CaminhoService;
@@ -24,8 +25,8 @@ public class CaminhoController {
     private final CaminhoService caminhoService;
 
     @PostMapping
-    public CaminhoResponse iniciar(@RequestBody @Valid CaminhoRequest request) {
-        return caminhoService.iniciar(request);
+    public CaminhoResponse iniciar(UsuarioAutenticado usuario, @RequestBody @Valid CaminhoRequest request) {
+        return caminhoService.iniciar(usuario.id(), request);
     }
 
     @PatchMapping("/{id}/finalizar")

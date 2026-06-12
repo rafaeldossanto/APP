@@ -35,18 +35,18 @@ public class PontoInteresseService {
 
     private static final double DISTANCIA_MAXIMA_METROS = 50.0;
 
-    public PontoInteresseResponse create(PontoInteresseRequest request) {
+    public PontoInteresseResponse create(String usuarioId, PontoInteresseRequest request) {
         log.info("Criando ponto de interesse tipo: {}", request.tipo());
 
         Caminho caminho = caminhoRepository.findById(request.caminhoId())
                 .orElseThrow(() -> new IllegalArgumentException("Caminho nao encontrado"));
 
-        PontoInteresse ponto = pontoRepository.save(PontoInteresseMapper.toEntity(request, caminho));
+        PontoInteresse ponto = pontoRepository.save(PontoInteresseMapper.toEntity(request, caminho, usuarioId));
 
         return PontoInteresseMapper.toResponse(ponto, 1);
     }
 
-    public EvidenciaResponse adicionarEvidencia(EvidenciaRequest request) {
+    public EvidenciaResponse adicionarEvidencia(String usuarioId, EvidenciaRequest request) {
         PontoInteresse ponto = pontoRepository.findById(request.pontoId())
                 .orElseThrow(() -> new IllegalArgumentException("Ponto nao encontrado"));
 
@@ -61,7 +61,7 @@ public class PontoInteresseService {
         }
 
         Evidencia evidencia = evidenciaRepository.save(
-                PontoInteresseMapper.toEvidenciaEntity(request, ponto, distancia)
+                PontoInteresseMapper.toEvidenciaEntity(request, ponto, distancia, usuarioId)
         );
         log.info("Evidencia validada e salva para ponto: {}", ponto.getId());
 

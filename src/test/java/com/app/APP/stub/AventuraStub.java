@@ -37,7 +37,7 @@ public final class AventuraStub {
     }
 
     public static AventuraRequest umRequest() {
-        return new AventuraRequest(USUARIO_ID, REGIAO_ID, DESTINO, VisibilidadeAventura.PRIVADA);
+        return new AventuraRequest(REGIAO_ID, DESTINO, VisibilidadeAventura.PRIVADA);
     }
 
     public static final class RegiaoStub {

@@ -31,15 +31,15 @@ public class AventuraService {
     private final RegiaoRepository regiaoRepository;
 
     @Transactional
-    public AventuraResponse create(AventuraRequest request) {
-        log.info("Criando aventura para usuario: {}", request.usuarioId());
+    public AventuraResponse create(String usuarioId, AventuraRequest request) {
+        log.info("Criando aventura para usuario: {}", usuarioId);
 
         Regiao regiao = regiaoRepository.findById(request.regiaoId())
                 .orElseThrow(() -> new IllegalArgumentException("regiao nao encontrada"));
 
-        var aventura = aventuraRepository.save(AventuraMapper.toEntity(request, regiao));
+        var aventura = aventuraRepository.save(AventuraMapper.toEntity(request, regiao, usuarioId));
 
-        participanteRepository.save(ParticipanteMapper.toEntity(aventura, request));
+        participanteRepository.save(ParticipanteMapper.toEntity(aventura, usuarioId));
 
         log.info("Aventura criada com id: {}", aventura.getId());
         return toResponse(aventura);
@@ -54,9 +54,9 @@ public class AventuraService {
                 .map(AventuraMapper::toResponse);
     }
 
-    public AventuraResponse atualizarStatus(String id, StatusAventura status) {
+    public AventuraResponse atualizarStatus(String usuarioId, String id, StatusAventura status) {
         log.info("Atualizando status da aventura {} para {}", id, status);
-        Aventura aventura = findById(id);
+        Aventura aventura = findDono(usuarioId, id);
         aventura.setStatus(status);
         aventura.setAtualizadoEm(LocalDateTime.now());
         return toResponse(aventuraRepository.save(aventura));
@@ -73,8 +73,8 @@ public class AventuraService {
         log.info("Usuario {} adicionado a aventura {}", usuarioId, aventuraId);
     }
 
-    public void delete(String id) {
-        Aventura aventura = findById(id);
+    public void delete(String usuarioId, String id) {
+        Aventura aventura = findDono(usuarioId, id);
         aventuraRepository.delete(aventura);
         log.info("Aventura {} deletada", id);
     }
@@ -82,6 +82,14 @@ public class AventuraService {
     private Aventura findById(String id) {
         return aventuraRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Aventura nao encontrada"));
+    }
+
+    private Aventura findDono(String usuarioId, String id) {
+        Aventura aventura = findById(id);
+        if (!usuarioId.equals(aventura.getUsuarioId())) {
+            throw new IllegalArgumentException("Voce nao e o dono desta aventura");
+        }
+        return aventura;
     }
 
 

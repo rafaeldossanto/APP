@@ -14,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static com.app.APP.mapper.AmizadeMapper.toResponse;
 
@@ -27,29 +26,25 @@ public class AmizadeService {
     private final AmizadesRepository amizadesRepository;
     private final UsuarioRepository usuarioRepository;
 
-    public AmizadeResponse solicitar(AmizadeRequest request) {
-        log.info("Solicitacao de amizade de {} para {}", request.solicitanteId(), request.receptorId());
+    public AmizadeResponse solicitar(String solicitanteId, AmizadeRequest request) {
+        log.info("Solicitacao de amizade de {} para {}", solicitanteId, request.receptorId());
 
         if (!usuarioRepository.existsById(request.receptorId())) {
             throw new IllegalArgumentException("Usuario receptor nao encontrado");
         }
 
-        amizadesRepository.findRelacao(request.solicitanteId(), request.receptorId())
+        amizadesRepository.findRelacao(solicitanteId, request.receptorId())
                 .ifPresent(a -> { throw new IllegalArgumentException("Ja existe uma relacao entre esses usuarios"); });
 
-        Amizades amizade = Amizades.builder()
-                .id(UUID.randomUUID().toString())
-                .solicitanteId(request.solicitanteId())
-                .receptorId(request.receptorId())
-                .solicitadoEm(LocalDateTime.now())
-                .build();
-
-        return toResponse(amizadesRepository.save(amizade));
+        return toResponse(amizadesRepository.save(AmizadeMapper.toEntity(solicitanteId, request)));
     }
 
-    public AmizadeResponse responder(String amizadeId, StatusAmizade status) {
+    public AmizadeResponse responder(String usuarioId, String amizadeId, StatusAmizade status) {
         Amizades amizade = findById(amizadeId);
 
+        if (!usuarioId.equals(amizade.getReceptorId())) {
+            throw new IllegalArgumentException("Apenas o destinatario pode responder a solicitacao");
+        }
         if (!StatusAmizade.PENDENTE.equals(amizade.getStatus())) {
             throw new IllegalArgumentException("Essa solicitacao ja foi respondida");
         }
@@ -62,9 +57,12 @@ public class AmizadeService {
     }
 
     /** O solicitante desiste de uma solicitacao ainda pendente. */
-    public void cancelarSolicitacao(String amizadeId) {
+    public void cancelarSolicitacao(String usuarioId, String amizadeId) {
         Amizades amizade = findById(amizadeId);
 
+        if (!usuarioId.equals(amizade.getSolicitanteId())) {
+            throw new IllegalArgumentException("Apenas quem enviou pode cancelar a solicitacao");
+        }
         if (!StatusAmizade.PENDENTE.equals(amizade.getStatus())) {
             throw new IllegalArgumentException("So e possivel cancelar uma solicitacao pendente");
         }
@@ -73,9 +71,10 @@ public class AmizadeService {
         log.info("Solicitacao de amizade {} cancelada", amizadeId);
     }
 
-    /** Desfaz uma amizade ja aceita (unfriend). */
-    public void desfazerAmizade(String amizadeId) {
+    /** Desfaz uma amizade ja aceita (unfriend) — qualquer um dos dois pode. */
+    public void desfazerAmizade(String usuarioId, String amizadeId) {
         Amizades amizade = findById(amizadeId);
+        validarParticipante(amizade, usuarioId);
 
         if (!StatusAmizade.ACEITA.equals(amizade.getStatus())) {
             throw new IllegalArgumentException("So e possivel desfazer uma amizade aceita");
@@ -89,34 +88,32 @@ public class AmizadeService {
      * Bloqueia um usuario: reaproveita a relacao existente (se houver) ou cria uma
      * nova, marcando-a como BLOQUEADA e registrando quem efetuou o bloqueio.
      */
-    public AmizadeResponse bloquear(AmizadeRequest request) {
-        log.info("Usuario {} bloqueando {}", request.solicitanteId(), request.receptorId());
+    public AmizadeResponse bloquear(String bloqueadorId, AmizadeRequest request) {
+        log.info("Usuario {} bloqueando {}", bloqueadorId, request.receptorId());
 
         if (!usuarioRepository.existsById(request.receptorId())) {
             throw new IllegalArgumentException("Usuario a bloquear nao encontrado");
         }
 
-        Amizades amizade = amizadesRepository.findRelacao(request.solicitanteId(), request.receptorId())
-                .orElseGet(() -> Amizades.builder()
-                        .id(UUID.randomUUID().toString())
-                        .solicitanteId(request.solicitanteId())
-                        .receptorId(request.receptorId())
-                        .solicitadoEm(LocalDateTime.now())
-                        .build());
+        Amizades amizade = amizadesRepository.findRelacao(bloqueadorId, request.receptorId())
+                .orElseGet(() -> AmizadeMapper.toEntity(bloqueadorId, request));
 
         amizade.setStatus(StatusAmizade.BLOQUEADA);
-        amizade.setBloqueadoPor(request.solicitanteId());
+        amizade.setBloqueadoPor(bloqueadorId);
         amizade.setRespondidoEm(LocalDateTime.now());
 
         return toResponse(amizadesRepository.save(amizade));
     }
 
-    /** Remove um bloqueio, voltando ao estado sem relacao. */
-    public void desbloquear(String amizadeId) {
+    /** Remove um bloqueio — apenas quem bloqueou pode. */
+    public void desbloquear(String usuarioId, String amizadeId) {
         Amizades amizade = findById(amizadeId);
 
         if (!StatusAmizade.BLOQUEADA.equals(amizade.getStatus())) {
             throw new IllegalArgumentException("Essa relacao nao esta bloqueada");
+        }
+        if (!usuarioId.equals(amizade.getBloqueadoPor())) {
+            throw new IllegalArgumentException("Apenas quem bloqueou pode desbloquear");
         }
 
         amizadesRepository.delete(amizade);
@@ -140,8 +137,22 @@ public class AmizadeService {
                 .map(AmizadeMapper::toResponse);
     }
 
+    /** Indica se os dois usuarios sao amigos (relacao ACEITA) — usado pelo loc. */
+    public boolean saoAmigos(String usuarioA, String usuarioB) {
+        return amizadesRepository.findRelacao(usuarioA, usuarioB)
+                .filter(a -> StatusAmizade.ACEITA.equals(a.getStatus()))
+                .isPresent();
+    }
+
     private Amizades findById(String id) {
         return amizadesRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Amizade nao encontrada"));
+    }
+
+    private void validarParticipante(Amizades amizade, String usuarioId) {
+        boolean participa = usuarioId.equals(amizade.getSolicitanteId()) || usuarioId.equals(amizade.getReceptorId());
+        if (!participa) {
+            throw new IllegalArgumentException("Voce nao participa dessa relacao");
+        }
     }
 }

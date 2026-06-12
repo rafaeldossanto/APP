@@ -36,14 +36,14 @@ public final class MidiaStub {
     /** Request com caminho associado. */
     public static MidiaRequest umRequest() {
         return new MidiaRequest(
-                AventuraStub.ID, CaminhoStub.ID, USUARIO_ID, TipoMidia.FOTO,
+                AventuraStub.ID, CaminhoStub.ID, TipoMidia.FOTO,
                 URL, -20.43, -41.79, 1.5, 0.30);
     }
 
     /** Request avulso (sem caminho). */
     public static MidiaRequest umRequestSemCaminho() {
         return new MidiaRequest(
-                AventuraStub.ID, null, USUARIO_ID, TipoMidia.FOTO,
+                AventuraStub.ID, null, TipoMidia.FOTO,
                 URL, -20.43, -41.79, 1.5, 0.30);
     }
 }

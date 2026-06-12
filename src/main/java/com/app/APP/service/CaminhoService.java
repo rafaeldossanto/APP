@@ -25,17 +25,15 @@ public class CaminhoService {
     private final CaminhoRepository caminhoRepository;
     private final AventuraRepository aventuraRepository;
 
-    public CaminhoResponse iniciar(CaminhoRequest request) {
-        log.info("Iniciando caminho para usuario: {} na aventura: {}", request.usuarioId(), request.aventuraId());
+    public CaminhoResponse iniciar(String usuarioId, CaminhoRequest request) {
+        log.info("Iniciando caminho para usuario: {} na aventura: {}", usuarioId, request.aventuraId());
 
         Aventura aventura = aventuraRepository.findById(request.aventuraId())
                 .orElseThrow(() -> new IllegalArgumentException("Aventura nao encontrada"));
 
-        // Numero do caminho e sequencial por aventura (1, 2, 3...), gerado aqui —
-        // nao vem do cliente.
         int numero = caminhoRepository.countByAventuraId(request.aventuraId()) + 1;
 
-        return toResponse(caminhoRepository.save(CaminhoMapper.toEntity(request, aventura, numero)));
+        return toResponse(caminhoRepository.save(CaminhoMapper.toEntity(request, aventura, numero, usuarioId)));
     }
 
     public CaminhoResponse finalizar(String id, Double distanciaTotalKm) {

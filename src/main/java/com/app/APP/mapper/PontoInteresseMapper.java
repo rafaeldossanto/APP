@@ -15,11 +15,11 @@ import java.util.UUID;
 @UtilityClass
 public class PontoInteresseMapper {
 
-    public static PontoInteresse toEntity(PontoInteresseRequest request, Caminho caminho) {
+    public static PontoInteresse toEntity(PontoInteresseRequest request, Caminho caminho, String usuarioId) {
         return PontoInteresse.builder()
                 .id(UUID.randomUUID().toString())
                 .caminho(caminho)
-                .usuarioId(request.usuarioId())
+                .usuarioId(usuarioId)
                 .tipo(request.tipo())
                 .nome(request.nome())
                 .descricao(request.descricao())
@@ -29,11 +29,11 @@ public class PontoInteresseMapper {
                 .build();
     }
 
-    public static Evidencia toEvidenciaEntity(EvidenciaRequest request, PontoInteresse ponto, double distancia) {
+    public static Evidencia toEvidenciaEntity(EvidenciaRequest request, PontoInteresse ponto, double distancia, String usuarioId) {
         return Evidencia.builder()
                 .id(UUID.randomUUID().toString())
                 .ponto(ponto)
-                .usuarioId(request.usuarioId())
+                .usuarioId(usuarioId)
                 .fotoUrl(request.fotoUrl())
                 .tipoEvidencia(request.tipoEvidencia())
                 .latCaptura(request.latCaptura())

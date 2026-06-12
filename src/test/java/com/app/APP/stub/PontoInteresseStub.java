@@ -40,7 +40,7 @@ public final class PontoInteresseStub {
 
     public static PontoInteresseRequest umRequest() {
         return new PontoInteresseRequest(
-                CaminhoStub.ID, USUARIO_ID, TipoPonto.MIRANTE,
+                CaminhoStub.ID, TipoPonto.MIRANTE,
                 "Mirante do Vale", "Vista panoramica", LATITUDE, LONGITUDE);
     }
 
@@ -62,14 +62,14 @@ public final class PontoInteresseStub {
     /** Evidencia capturada exatamente sobre o ponto (distancia ~0m, valida). */
     public static EvidenciaRequest umRequestEvidenciaProxima() {
         return new EvidenciaRequest(
-                ID, USUARIO_ID, "https://cdn/foto.jpg",
+                ID, "https://cdn/foto.jpg",
                 TipoEvidencia.VISTA, LATITUDE, LONGITUDE);
     }
 
     /** Evidencia capturada longe do ponto (~111km, deve ser rejeitada). */
     public static EvidenciaRequest umRequestEvidenciaLonge() {
         return new EvidenciaRequest(
-                ID, USUARIO_ID, "https://cdn/foto.jpg",
+                ID, "https://cdn/foto.jpg",
                 TipoEvidencia.VISTA, LATITUDE + 1.0, LONGITUDE);
     }
 }

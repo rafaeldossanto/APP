@@ -53,7 +53,7 @@ class CaminhoServiceTest {
         when(caminhoRepository.countByAventuraId(request.aventuraId())).thenReturn(2);
         when(caminhoRepository.save(any(Caminho.class))).thenReturn(salvo);
 
-        CaminhoResponse response = service.iniciar(request);
+        CaminhoResponse response = service.iniciar(CaminhoStub.USUARIO_ID, request);
 
         assertThat(response.id()).isEqualTo(salvo.getId());
         assertThat(response.usuarioId()).isEqualTo(CaminhoStub.USUARIO_ID);
@@ -69,7 +69,7 @@ class CaminhoServiceTest {
         CaminhoRequest request = CaminhoStub.umRequest();
         when(aventuraRepository.findById(request.aventuraId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.iniciar(request))
+        assertThatThrownBy(() -> service.iniciar(CaminhoStub.USUARIO_ID, request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Aventura nao encontrada");
 

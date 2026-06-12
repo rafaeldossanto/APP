@@ -1,5 +1,6 @@
 package com.app.APP.controller;
 
+import com.app.APP.auth.UsuarioAutenticado;
 import com.app.APP.model.dto.request.AmizadeRequest;
 import com.app.APP.model.dto.response.AmizadeResponse;
 import com.app.APP.model.enums.StatusAmizade;
@@ -26,48 +27,54 @@ public class AmizadeController {
     private final AmizadeService amizadeService;
 
     @PostMapping
-    public AmizadeResponse solicitar(@RequestBody @Valid AmizadeRequest request) {
-        return amizadeService.solicitar(request);
+    public AmizadeResponse solicitar(UsuarioAutenticado usuario, @RequestBody @Valid AmizadeRequest request) {
+        return amizadeService.solicitar(usuario.id(), request);
     }
 
     @PatchMapping("/{id}/responder")
-    public AmizadeResponse responder(@PathVariable String id,
+    public AmizadeResponse responder(UsuarioAutenticado usuario, @PathVariable String id,
                                      @RequestParam StatusAmizade status) {
-        return amizadeService.responder(id, status);
+        return amizadeService.responder(usuario.id(), id, status);
     }
 
     @DeleteMapping("/{id}/solicitacao")
-    public void cancelarSolicitacao(@PathVariable String id) {
-        amizadeService.cancelarSolicitacao(id);
+    public void cancelarSolicitacao(UsuarioAutenticado usuario, @PathVariable String id) {
+        amizadeService.cancelarSolicitacao(usuario.id(), id);
     }
 
     @DeleteMapping("/{id}")
-    public void desfazerAmizade(@PathVariable String id) {
-        amizadeService.desfazerAmizade(id);
+    public void desfazerAmizade(UsuarioAutenticado usuario, @PathVariable String id) {
+        amizadeService.desfazerAmizade(usuario.id(), id);
     }
 
     @PostMapping("/bloquear")
-    public AmizadeResponse bloquear(@RequestBody @Valid AmizadeRequest request) {
-        return amizadeService.bloquear(request);
+    public AmizadeResponse bloquear(UsuarioAutenticado usuario, @RequestBody @Valid AmizadeRequest request) {
+        return amizadeService.bloquear(usuario.id(), request);
     }
 
     @DeleteMapping("/{id}/bloqueio")
-    public void desbloquear(@PathVariable String id) {
-        amizadeService.desbloquear(id);
+    public void desbloquear(UsuarioAutenticado usuario, @PathVariable String id) {
+        amizadeService.desbloquear(usuario.id(), id);
     }
 
-    @GetMapping("/pendentes/{usuarioId}")
-    public Page<AmizadeResponse> getPendentes(@PathVariable String usuarioId, Pageable pageable) {
-        return amizadeService.getPendentes(usuarioId, pageable);
+    @GetMapping("/pendentes")
+    public Page<AmizadeResponse> getPendentes(UsuarioAutenticado usuario, Pageable pageable) {
+        return amizadeService.getPendentes(usuario.id(), pageable);
     }
 
-    @GetMapping("/enviadas/{usuarioId}")
-    public Page<AmizadeResponse> getEnviadas(@PathVariable String usuarioId, Pageable pageable) {
-        return amizadeService.getEnviadas(usuarioId, pageable);
+    @GetMapping("/enviadas")
+    public Page<AmizadeResponse> getEnviadas(UsuarioAutenticado usuario, Pageable pageable) {
+        return amizadeService.getEnviadas(usuario.id(), pageable);
     }
 
-    @GetMapping("/amigos/{usuarioId}")
-    public Page<AmizadeResponse> getAmigos(@PathVariable String usuarioId, Pageable pageable) {
-        return amizadeService.getAmigos(usuarioId, pageable);
+    @GetMapping("/amigos")
+    public Page<AmizadeResponse> getAmigos(UsuarioAutenticado usuario, Pageable pageable) {
+        return amizadeService.getAmigos(usuario.id(), pageable);
+    }
+
+    /** Consulta de amizade entre dois usuarios — usada pelo servico de Localizacao (visibilidade AMIGOS). */
+    @GetMapping("/sao-amigos")
+    public boolean saoAmigos(@RequestParam String a, @RequestParam String b) {
+        return amizadeService.saoAmigos(a, b);
     }
 }
