@@ -2,6 +2,7 @@ package com.app.APP.entity;
 
 import com.app.APP.model.enums.StatusAventura;
 import com.app.APP.model.enums.VisibilidadeAventura;
+import com.app.APP.trace.TraceContext;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,4 +58,14 @@ public class Aventura {
 
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
+
+    @Column(name = "trace_id")
+    private String traceId;
+
+    @PrePersist
+    void aoCriar() {
+        if (traceId == null) {
+            traceId = TraceContext.atual();
+        }
+    }
 }
