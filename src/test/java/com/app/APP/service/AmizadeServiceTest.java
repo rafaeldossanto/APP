@@ -1,6 +1,7 @@
 package com.app.APP.service;
 
 import com.app.APP.entity.Amizades;
+import com.app.APP.entity.Usuario;
 import com.app.APP.model.dto.request.AmizadeRequest;
 import com.app.APP.model.dto.response.AmizadeResponse;
 import com.app.APP.model.enums.StatusAmizade;
@@ -24,6 +25,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,13 +44,21 @@ class AmizadeServiceTest {
 
     private final Pageable pageable = PageRequest.of(0, 10);
 
+    /** Receptor resolvido pelo codigoUsuario (entidade Usuario e @Immutable). */
+    private Usuario receptor() {
+        Usuario usuario = mock(Usuario.class);
+        when(usuario.getId()).thenReturn(AmizadeStub.RECEPTOR_ID);
+        return usuario;
+    }
+
     // ---- solicitar ----
 
     @Test
     @DisplayName("solicitar deve criar amizade pendente com o solicitante do token")
     void deveSolicitarAmizade() {
         AmizadeRequest request = AmizadeStub.umRequest();
-        when(usuarioRepository.existsById(AmizadeStub.RECEPTOR_ID)).thenReturn(true);
+        final Usuario receptor = receptor();
+        when(usuarioRepository.findByCodigoUsuario(AmizadeStub.RECEPTOR_CODIGO)).thenReturn(Optional.of(receptor));
         when(amizadesRepository.findRelacao(AmizadeStub.SOLICITANTE_ID, AmizadeStub.RECEPTOR_ID)).thenReturn(Optional.empty());
         when(amizadesRepository.save(any(Amizades.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -63,7 +73,7 @@ class AmizadeServiceTest {
     @Test
     @DisplayName("solicitar deve falhar quando receptor nao existe")
     void deveFalharReceptorInexistente() {
-        when(usuarioRepository.existsById(AmizadeStub.RECEPTOR_ID)).thenReturn(false);
+        when(usuarioRepository.findByCodigoUsuario(AmizadeStub.RECEPTOR_CODIGO)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.solicitar(AmizadeStub.SOLICITANTE_ID, AmizadeStub.umRequest()))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -75,7 +85,8 @@ class AmizadeServiceTest {
     @Test
     @DisplayName("solicitar deve falhar quando ja existe relacao")
     void deveFalharRelacaoDuplicada() {
-        when(usuarioRepository.existsById(AmizadeStub.RECEPTOR_ID)).thenReturn(true);
+        final Usuario receptor = receptor();
+        when(usuarioRepository.findByCodigoUsuario(AmizadeStub.RECEPTOR_CODIGO)).thenReturn(Optional.of(receptor));
         when(amizadesRepository.findRelacao(AmizadeStub.SOLICITANTE_ID, AmizadeStub.RECEPTOR_ID))
                 .thenReturn(Optional.of(AmizadeStub.umaAmizade().build()));
 
@@ -183,7 +194,8 @@ class AmizadeServiceTest {
     @DisplayName("bloquear deve marcar relacao existente como BLOQUEADA e registrar quem bloqueou")
     void deveBloquearRelacaoExistente() {
         Amizades amizade = AmizadeStub.umaAmizade().status(StatusAmizade.ACEITA).build();
-        when(usuarioRepository.existsById(AmizadeStub.RECEPTOR_ID)).thenReturn(true);
+        final Usuario receptor = receptor();
+        when(usuarioRepository.findByCodigoUsuario(AmizadeStub.RECEPTOR_CODIGO)).thenReturn(Optional.of(receptor));
         when(amizadesRepository.findRelacao(AmizadeStub.SOLICITANTE_ID, AmizadeStub.RECEPTOR_ID)).thenReturn(Optional.of(amizade));
         when(amizadesRepository.save(any(Amizades.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -196,7 +208,8 @@ class AmizadeServiceTest {
     @Test
     @DisplayName("bloquear deve criar relacao BLOQUEADA quando nao havia relacao previa")
     void deveBloquearSemRelacaoPrevia() {
-        when(usuarioRepository.existsById(AmizadeStub.RECEPTOR_ID)).thenReturn(true);
+        final Usuario receptor = receptor();
+        when(usuarioRepository.findByCodigoUsuario(AmizadeStub.RECEPTOR_CODIGO)).thenReturn(Optional.of(receptor));
         when(amizadesRepository.findRelacao(AmizadeStub.SOLICITANTE_ID, AmizadeStub.RECEPTOR_ID)).thenReturn(Optional.empty());
         when(amizadesRepository.save(any(Amizades.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -209,7 +222,7 @@ class AmizadeServiceTest {
     @Test
     @DisplayName("bloquear deve falhar quando o alvo nao existe")
     void deveFalharBloquearAlvoInexistente() {
-        when(usuarioRepository.existsById(AmizadeStub.RECEPTOR_ID)).thenReturn(false);
+        when(usuarioRepository.findByCodigoUsuario(AmizadeStub.RECEPTOR_CODIGO)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.bloquear(AmizadeStub.SOLICITANTE_ID, AmizadeStub.umRequest()))
                 .isInstanceOf(IllegalArgumentException.class)

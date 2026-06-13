@@ -1,7 +1,6 @@
 package com.app.APP.mapper;
 
 import com.app.APP.entity.Amizades;
-import com.app.APP.model.dto.request.AmizadeRequest;
 import com.app.APP.model.dto.response.AmizadeResponse;
 import lombok.experimental.UtilityClass;
 
@@ -11,11 +10,11 @@ import java.util.UUID;
 @UtilityClass
 public class AmizadeMapper {
 
-    public static Amizades toEntity(String solicitanteId, AmizadeRequest request) {
+    public static Amizades toEntity(String solicitanteId, String receptorId) {
         return Amizades.builder()
                 .id(UUID.randomUUID().toString())
                 .solicitanteId(solicitanteId)
-                .receptorId(request.receptorId())
+                .receptorId(receptorId)
                 .solicitadoEm(LocalDateTime.now())
                 .build();
     }

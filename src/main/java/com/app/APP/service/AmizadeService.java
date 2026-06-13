@@ -1,6 +1,7 @@
 package com.app.APP.service;
 
 import com.app.APP.entity.Amizades;
+import com.app.APP.entity.Usuario;
 import com.app.APP.mapper.AmizadeMapper;
 import com.app.APP.model.dto.request.AmizadeRequest;
 import com.app.APP.model.dto.response.AmizadeResponse;
@@ -27,16 +28,14 @@ public class AmizadeService {
     private final UsuarioRepository usuarioRepository;
 
     public AmizadeResponse solicitar(String solicitanteId, AmizadeRequest request) {
-        log.info("Solicitacao de amizade de {} para {}", solicitanteId, request.receptorId());
+        log.info("Solicitacao de amizade de {} para {}", solicitanteId, request.receptorCodigo());
 
-        if (!usuarioRepository.existsById(request.receptorId())) {
-            throw new IllegalArgumentException("Usuario receptor nao encontrado");
-        }
+        String receptorId = resolverReceptor(request.receptorCodigo());
 
-        amizadesRepository.findRelacao(solicitanteId, request.receptorId())
+        amizadesRepository.findRelacao(solicitanteId, receptorId)
                 .ifPresent(a -> { throw new IllegalArgumentException("Ja existe uma relacao entre esses usuarios"); });
 
-        return toResponse(amizadesRepository.save(AmizadeMapper.toEntity(solicitanteId, request)));
+        return toResponse(amizadesRepository.save(AmizadeMapper.toEntity(solicitanteId, receptorId)));
     }
 
     public AmizadeResponse responder(String usuarioId, String amizadeId, StatusAmizade status) {
@@ -89,14 +88,12 @@ public class AmizadeService {
      * nova, marcando-a como BLOQUEADA e registrando quem efetuou o bloqueio.
      */
     public AmizadeResponse bloquear(String bloqueadorId, AmizadeRequest request) {
-        log.info("Usuario {} bloqueando {}", bloqueadorId, request.receptorId());
+        log.info("Usuario {} bloqueando {}", bloqueadorId, request.receptorCodigo());
 
-        if (!usuarioRepository.existsById(request.receptorId())) {
-            throw new IllegalArgumentException("Usuario a bloquear nao encontrado");
-        }
+        String receptorId = resolverReceptor(request.receptorCodigo());
 
-        Amizades amizade = amizadesRepository.findRelacao(bloqueadorId, request.receptorId())
-                .orElseGet(() -> AmizadeMapper.toEntity(bloqueadorId, request));
+        Amizades amizade = amizadesRepository.findRelacao(bloqueadorId, receptorId)
+                .orElseGet(() -> AmizadeMapper.toEntity(bloqueadorId, receptorId));
 
         amizade.setStatus(StatusAmizade.BLOQUEADA);
         amizade.setBloqueadoPor(bloqueadorId);
@@ -142,6 +139,12 @@ public class AmizadeService {
         return amizadesRepository.findRelacao(usuarioA, usuarioB)
                 .filter(a -> StatusAmizade.ACEITA.equals(a.getStatus()))
                 .isPresent();
+    }
+
+    private String resolverReceptor(String codigoUsuario) {
+        return usuarioRepository.findByCodigoUsuario(codigoUsuario)
+                .map(Usuario::getId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario receptor nao encontrado"));
     }
 
     private Amizades findById(String id) {
