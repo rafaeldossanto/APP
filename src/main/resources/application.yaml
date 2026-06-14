@@ -14,10 +14,16 @@ spring:
       # e gerar o baseline do schema via Flyway.
       ddl-auto: ${DDL_AUTO:update}
     show-sql: false
+    # Roda o data.sql (seed de regioes) depois que o Hibernate cria as tabelas.
+    defer-datasource-initialization: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  sql:
+    init:
+      mode: always
 
   flyway:
     enabled: true
