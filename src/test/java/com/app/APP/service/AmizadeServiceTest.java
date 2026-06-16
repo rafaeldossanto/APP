@@ -6,6 +6,7 @@ import com.app.APP.model.dto.request.AmizadeRequest;
 import com.app.APP.model.dto.response.AmizadeResponse;
 import com.app.APP.model.enums.StatusAmizade;
 import com.app.APP.repository.AmizadesRepository;
+import com.app.APP.repository.SeguidorRepository;
 import com.app.APP.repository.UsuarioRepository;
 import com.app.APP.stub.AmizadeStub;
 import org.junit.jupiter.api.DisplayName;
@@ -38,6 +39,8 @@ class AmizadeServiceTest {
     private AmizadesRepository amizadesRepository;
     @Mock
     private UsuarioRepository usuarioRepository;
+    @Mock
+    private SeguidorRepository seguidorRepository;
 
     @InjectMocks
     private AmizadeService service;
@@ -61,6 +64,7 @@ class AmizadeServiceTest {
         when(usuarioRepository.findByCodigoUsuario(AmizadeStub.RECEPTOR_CODIGO)).thenReturn(Optional.of(receptor));
         when(amizadesRepository.findRelacao(AmizadeStub.SOLICITANTE_ID, AmizadeStub.RECEPTOR_ID)).thenReturn(Optional.empty());
         when(amizadesRepository.save(any(Amizades.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(seguidorRepository.existsBySeguidorIdAndSeguidoId(any(), any())).thenReturn(true);
 
         AmizadeResponse response = service.solicitar(AmizadeStub.SOLICITANTE_ID, request);
 
@@ -87,6 +91,7 @@ class AmizadeServiceTest {
     void deveFalharRelacaoDuplicada() {
         final Usuario receptor = receptor();
         when(usuarioRepository.findByCodigoUsuario(AmizadeStub.RECEPTOR_CODIGO)).thenReturn(Optional.of(receptor));
+        when(seguidorRepository.existsBySeguidorIdAndSeguidoId(any(), any())).thenReturn(true);
         when(amizadesRepository.findRelacao(AmizadeStub.SOLICITANTE_ID, AmizadeStub.RECEPTOR_ID))
                 .thenReturn(Optional.of(AmizadeStub.umaAmizade().build()));
 

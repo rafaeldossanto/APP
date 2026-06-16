@@ -7,6 +7,7 @@ import com.app.APP.model.dto.request.AmizadeRequest;
 import com.app.APP.model.dto.response.AmizadeResponse;
 import com.app.APP.model.enums.StatusAmizade;
 import com.app.APP.repository.AmizadesRepository;
+import com.app.APP.repository.SeguidorRepository;
 import com.app.APP.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,11 +27,16 @@ public class AmizadeService {
 
     private final AmizadesRepository amizadesRepository;
     private final UsuarioRepository usuarioRepository;
+    private final SeguidorRepository seguidorRepository;
 
     public AmizadeResponse solicitar(String solicitanteId, AmizadeRequest request) {
         log.info("Solicitacao de amizade de {} para {}", solicitanteId, request.receptorCodigo());
 
         String receptorId = resolverReceptor(request.receptorCodigo());
+
+        if (!seSeguemMutuamente(solicitanteId, receptorId)) {
+            throw new IllegalArgumentException("Voces precisam se seguir mutuamente para virar amigos");
+        }
 
         amizadesRepository.findRelacao(solicitanteId, receptorId)
                 .ifPresent(a -> { throw new IllegalArgumentException("Ja existe uma relacao entre esses usuarios"); });
@@ -139,6 +145,11 @@ public class AmizadeService {
         return amizadesRepository.findRelacao(usuarioA, usuarioB)
                 .filter(a -> StatusAmizade.ACEITA.equals(a.getStatus()))
                 .isPresent();
+    }
+
+    private boolean seSeguemMutuamente(String a, String b) {
+        return seguidorRepository.existsBySeguidorIdAndSeguidoId(a, b)
+                && seguidorRepository.existsBySeguidorIdAndSeguidoId(b, a);
     }
 
     private String resolverReceptor(String codigoUsuario) {
