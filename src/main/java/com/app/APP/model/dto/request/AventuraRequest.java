@@ -4,11 +4,12 @@ import com.app.APP.model.enums.VisibilidadeAventura;
 import jakarta.validation.constraints.NotBlank;
 
 /**
- * Criacao de aventura. A visibilidade e opcional (a entidade tem default
- * PRIVADA); regiao e destino sao obrigatorios. O dono vem do token, nao do corpo.
+ * Criacao de aventura. regiao (pasta) e opcional — aventura pode existir solta;
+ * destino e obrigatorio. Visibilidade opcional (entidade tem default PRIVADA).
+ * O dono vem do token, nao do corpo.
  */
 public record AventuraRequest(
-        @NotBlank String regiaoId,
+        String regiaoId,
         @NotBlank String destino,
         VisibilidadeAventura visibilidade
 ) {}

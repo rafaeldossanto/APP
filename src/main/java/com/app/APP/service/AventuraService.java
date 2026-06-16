@@ -34,8 +34,7 @@ public class AventuraService {
     public AventuraResponse create(String usuarioId, AventuraRequest request) {
         log.info("Criando aventura para usuario: {}", usuarioId);
 
-        Regiao regiao = regiaoRepository.findById(request.regiaoId())
-                .orElseThrow(() -> new IllegalArgumentException("regiao nao encontrada"));
+        Regiao regiao = resolverRegiao(usuarioId, request.regiaoId());
 
         var aventura = aventuraRepository.save(AventuraMapper.toEntity(request, regiao, usuarioId));
 
@@ -43,6 +42,29 @@ public class AventuraService {
 
         log.info("Aventura criada com id: {}", aventura.getId());
         return toResponse(aventura);
+    }
+
+    /** Move a aventura para uma pasta (regiao) ou tira dela (regiaoId nulo). */
+    @Transactional
+    public AventuraResponse moverRegiao(String usuarioId, String aventuraId, String regiaoId) {
+        Aventura aventura = findDono(usuarioId, aventuraId);
+        aventura.setRegiao(resolverRegiao(usuarioId, regiaoId));
+        aventura.setAtualizadoEm(LocalDateTime.now());
+        log.info("Aventura {} movida para regiao {}", aventuraId, regiaoId);
+        return toResponse(aventuraRepository.save(aventura));
+    }
+
+    /** Regiao opcional: nula quando nao informada; se vier, precisa ser do usuario. */
+    private Regiao resolverRegiao(String usuarioId, String regiaoId) {
+        if (regiaoId == null || regiaoId.isBlank()) {
+            return null;
+        }
+        Regiao regiao = regiaoRepository.findById(regiaoId)
+                .orElseThrow(() -> new IllegalArgumentException("regiao nao encontrada"));
+        if (!usuarioId.equals(regiao.getUsuarioId())) {
+            throw new IllegalArgumentException("Voce nao e o dono desta regiao");
+        }
+        return regiao;
     }
 
     public AventuraResponse getById(String id) {

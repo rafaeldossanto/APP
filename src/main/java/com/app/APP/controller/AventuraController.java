@@ -2,6 +2,7 @@ package com.app.APP.controller;
 
 import com.app.APP.auth.UsuarioAutenticado;
 import com.app.APP.model.dto.request.AventuraRequest;
+import com.app.APP.model.dto.request.MoverRegiaoRequest;
 import com.app.APP.model.dto.response.AventuraResponse;
 import com.app.APP.model.enums.StatusAventura;
 import com.app.APP.service.AventuraService;
@@ -46,6 +47,12 @@ public class AventuraController {
                                             @PathVariable String id,
                                             @RequestParam StatusAventura status) {
         return aventuraService.atualizarStatus(usuario.id(), id, status);
+    }
+
+    @PatchMapping("/{id}/regiao")
+    public AventuraResponse moverRegiao(UsuarioAutenticado usuario, @PathVariable String id,
+                                        @RequestBody MoverRegiaoRequest request) {
+        return aventuraService.moverRegiao(usuario.id(), id, request.regiaoId());
     }
 
     @PostMapping("/{id}/participante")

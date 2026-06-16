@@ -5,6 +5,7 @@ import com.app.APP.entity.Regiao;
 import com.app.APP.model.dto.request.AventuraRequest;
 import com.app.APP.model.enums.StatusAventura;
 import com.app.APP.model.enums.VisibilidadeAventura;
+import com.app.APP.model.enums.VisibilidadeRegiao;
 
 import java.time.LocalDateTime;
 
@@ -48,10 +49,10 @@ public final class AventuraStub {
         public static Regiao.RegiaoBuilder umaRegiao() {
             return Regiao.builder()
                     .id(REGIAO_ID)
+                    .usuarioId(USUARIO_ID)
                     .nome("Serra do Caparao")
                     .descricao("Regiao de montanhas")
-                    .latMin(-20.5).latMax(-20.4)
-                    .lngMin(-41.9).lngMax(-41.8);
+                    .visibilidade(VisibilidadeRegiao.PRIVADA);
         }
     }
 }
