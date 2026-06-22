@@ -10,6 +10,7 @@ import com.app.APP.model.enums.FriendshipStatus;
 import com.app.APP.repository.FriendshipRepository;
 import com.app.APP.repository.AdventureRepository;
 import com.app.APP.repository.RegionRepository;
+import com.app.APP.util.OwnershipValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,10 +35,12 @@ public class RegionService {
         return RegionMapper.toResponse(regionRepository.save(RegionMapper.toEntity(request, userId)));
     }
 
+    @Transactional(readOnly = true)
     public Page<RegionResponse> listMine(String userId, Pageable pageable) {
         return regionRepository.findByUserId(userId, pageable).map(RegionMapper::toResponse);
     }
 
+    @Transactional(readOnly = true)
     public RegionResponse getById(String userId, String id) {
         Region region = find(id);
         validateAccess(region, userId);
@@ -61,6 +64,7 @@ public class RegionService {
     }
 
     /** Folders visible to the user that are not theirs (PUBLICA from everyone + AMIGOS from friends). */
+    @Transactional(readOnly = true)
     public Page<RegionResponse> discover(String userId, Pageable pageable) {
         List<String> friends = friendshipRepository.findFriendIds(userId, FriendshipStatus.ACEITA);
         List<String> filter = friends.isEmpty() ? List.of("__sem_amigos__") : friends;
@@ -68,6 +72,7 @@ public class RegionService {
     }
 
     /** Adventures in a folder, already filtered by each adventure's visibility. */
+    @Transactional(readOnly = true)
     public Page<AdventureResponse> getAdventures(String userId, String regionId, Pageable pageable) {
         Region region = find(regionId);
         validateAccess(region, userId);
@@ -98,9 +103,7 @@ public class RegionService {
 
     private Region findOwner(String id, String userId) {
         Region region = find(id);
-        if (!userId.equals(region.getUserId())) {
-            throw new IllegalArgumentException("Voce nao e o dono desta regiao");
-        }
+        OwnershipValidator.requireOwner(userId, region.getUserId(), "Voce nao e o dono desta regiao");
         return region;
     }
 }

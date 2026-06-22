@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -124,23 +125,27 @@ public class FriendshipService {
     }
 
     /** Pending requests that ARRIVED at the user (for them to respond). */
+    @Transactional(readOnly = true)
     public Page<FriendshipResponse> getPending(String userId, Pageable pageable) {
         return friendshipRepository.findByReceiverIdAndStatus(userId, FriendshipStatus.PENDENTE, pageable)
                 .map(FriendshipMapper::toResponse);
     }
 
     /** Pending requests the user SENT, awaiting response. */
+    @Transactional(readOnly = true)
     public Page<FriendshipResponse> getSent(String userId, Pageable pageable) {
         return friendshipRepository.findByRequesterIdAndStatus(userId, FriendshipStatus.PENDENTE, pageable)
                 .map(FriendshipMapper::toResponse);
     }
 
+    @Transactional(readOnly = true)
     public Page<FriendshipResponse> getFriends(String userId, Pageable pageable) {
         return friendshipRepository.findByUserIdAndStatus(userId, FriendshipStatus.ACEITA, pageable)
                 .map(FriendshipMapper::toResponse);
     }
 
     /** Indicates whether the two users are friends (ACEITA relation) — used by location service. */
+    @Transactional(readOnly = true)
     public boolean areFriends(String userA, String userB) {
         return friendshipRepository.findRelation(userA, userB)
                 .filter(f -> FriendshipStatus.ACEITA.equals(f.getStatus()))

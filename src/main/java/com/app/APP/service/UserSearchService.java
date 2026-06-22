@@ -6,6 +6,7 @@ import com.app.APP.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,12 +20,14 @@ public class UserSearchService {
 
     private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public PublicUserResponse findByCode(String userCode) {
         User user = userRepository.findByUserCode(userCode)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado"));
         return toPublic(user);
     }
 
+    @Transactional(readOnly = true)
     public List<PublicUserResponse> autocomplete(String term) {
         return userRepository.findByUserCodePrefix(term).stream()
                 .limit(AUTOCOMPLETE_LIMIT)

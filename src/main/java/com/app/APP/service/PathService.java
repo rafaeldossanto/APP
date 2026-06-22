@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -46,11 +47,13 @@ public class PathService {
         return toResponse(pathRepository.save(path));
     }
 
+    @Transactional(readOnly = true)
     public Page<PathResponse> getByAdventure(String adventureId, Pageable pageable) {
         return pathRepository.findByAdventureId(adventureId, pageable)
                 .map(PathMapper::toResponse);
     }
 
+    @Transactional(readOnly = true)
     public Page<PathResponse> getByUser(String userId, Pageable pageable) {
         return pathRepository.findByUserId(userId, pageable)
                 .map(PathMapper::toResponse);

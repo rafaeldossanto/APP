@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -68,12 +69,14 @@ public class PointOfInterestService {
         return PointOfInterestMapper.toEvidenceResponse(evidence);
     }
 
+    @Transactional(readOnly = true)
     public PointOfInterestResponse getById(String id) {
         PointOfInterest point = pointRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Ponto nao encontrado"));
         return PointOfInterestMapper.toResponse(point, calculateLevel(point));
     }
 
+    @Transactional(readOnly = true)
     public Page<PointOfInterestResponse> getByPath(String pathId, Pageable pageable) {
         Page<PointOfInterest> page = pointRepository.findByPathId(pathId, pageable);
 

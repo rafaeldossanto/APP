@@ -9,7 +9,9 @@ import com.app.APP.model.dto.response.MediaResponse;
 import com.app.APP.repository.AdventureRepository;
 import com.app.APP.repository.PathRepository;
 import com.app.APP.repository.MediaRepository;
+import com.app.APP.util.OwnershipValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,11 +45,13 @@ public class MediaService {
         return MediaMapper.toResponse(media);
     }
 
+    @Transactional(readOnly = true)
     public Page<MediaResponse> getByAdventure(String adventureId, Pageable pageable) {
         return mediaRepository.findByAdventureId(adventureId, pageable)
                 .map(MediaMapper::toResponse);
     }
 
+    @Transactional(readOnly = true)
     public Page<MediaResponse> getByPath(String pathId, Pageable pageable) {
         return mediaRepository.findByPathId(pathId, pageable)
                 .map(MediaMapper::toResponse);
@@ -57,9 +61,7 @@ public class MediaService {
         Media media = mediaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Midia nao encontrada"));
 
-        if (!userId.equals(media.getUserId())) {
-            throw new IllegalArgumentException("Voce nao e o dono desta midia");
-        }
+        OwnershipValidator.requireOwner(userId, media.getUserId(), "Voce nao e o dono desta midia");
 
         mediaRepository.delete(media);
         log.info("Media {} deleted", id);

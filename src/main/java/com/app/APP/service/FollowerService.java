@@ -59,14 +59,17 @@ public class FollowerService {
         log.info("{} unfollowed {}", followerId, followedCode);
     }
 
+    @Transactional(readOnly = true)
     public Page<PublicUserResponse> getFollowers(String userCode, Pageable pageable) {
         return followerRepository.findFollowers(resolveId(userCode), pageable);
     }
 
+    @Transactional(readOnly = true)
     public Page<PublicUserResponse> getFollowing(String userCode, Pageable pageable) {
         return followerRepository.findFollowing(resolveId(userCode), pageable);
     }
 
+    @Transactional(readOnly = true)
     public CountersResponse counters(String userCode) {
         String userId = resolveId(userCode);
         return new CountersResponse(
@@ -75,6 +78,7 @@ public class FollowerService {
     }
 
     /** Follow relation between the token user (me) and the user identified by code. */
+    @Transactional(readOnly = true)
     public FollowStatusResponse status(String myId, String otherCode) {
         String otherId = resolveId(otherCode);
         boolean following = followerRepository.existsByFollowerIdAndFollowedId(myId, otherId);

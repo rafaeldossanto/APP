@@ -10,7 +10,7 @@ import lombok.experimental.UtilityClass;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static java.util.Objects.nonNull;
+import static com.app.APP.mapper.MapperUtils.idOrNull;
 
 @UtilityClass
 public class MediaMapper {
@@ -35,7 +35,7 @@ public class MediaMapper {
         return MediaResponse.builder()
                 .id(media.getId())
                 .adventureId(media.getAdventure().getId())
-                .pathId(nonNull(media.getPath()) ? media.getPath().getId() : null)
+                .pathId(idOrNull(media.getPath(), Path::getId))
                 .type(media.getType())
                 .url(media.getUrl())
                 .pathPercentage(media.getPathPercentage())

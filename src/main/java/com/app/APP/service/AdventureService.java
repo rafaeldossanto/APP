@@ -10,6 +10,7 @@ import com.app.APP.model.enums.AdventureStatus;
 import com.app.APP.repository.AdventureRepository;
 import com.app.APP.repository.AdventureParticipantRepository;
 import com.app.APP.repository.RegionRepository;
+import com.app.APP.util.OwnershipValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -61,16 +62,16 @@ public class AdventureService {
         }
         Region region = regionRepository.findById(regionId)
                 .orElseThrow(() -> new IllegalArgumentException("regiao nao encontrada"));
-        if (!userId.equals(region.getUserId())) {
-            throw new IllegalArgumentException("Voce nao e o dono desta regiao");
-        }
+        OwnershipValidator.requireOwner(userId, region.getUserId(), "Voce nao e o dono desta regiao");
         return region;
     }
 
+    @Transactional(readOnly = true)
     public AdventureResponse getById(String id) {
         return toResponse(findById(id));
     }
 
+    @Transactional(readOnly = true)
     public Page<AdventureResponse> getByUser(String userId, Pageable pageable) {
         return adventureRepository.findByUserId(userId, pageable)
                 .map(AdventureMapper::toResponse);
@@ -108,9 +109,7 @@ public class AdventureService {
 
     private Adventure findOwner(String userId, String id) {
         Adventure adventure = findById(id);
-        if (!userId.equals(adventure.getUserId())) {
-            throw new IllegalArgumentException("Voce nao e o dono desta aventura");
-        }
+        OwnershipValidator.requireOwner(userId, adventure.getUserId(), "Voce nao e o dono desta aventura");
         return adventure;
     }
 }
