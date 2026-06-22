@@ -1,0 +1,67 @@
+package com.app.APP.service;
+
+import com.app.APP.entity.Adventure;
+import com.app.APP.entity.Media;
+import com.app.APP.entity.Path;
+import com.app.APP.mapper.MediaMapper;
+import com.app.APP.model.dto.request.MediaRequest;
+import com.app.APP.model.dto.response.MediaResponse;
+import com.app.APP.repository.AdventureRepository;
+import com.app.APP.repository.PathRepository;
+import com.app.APP.repository.MediaRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import static java.util.Objects.nonNull;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class MediaService {
+
+    private final MediaRepository mediaRepository;
+    private final AdventureRepository adventureRepository;
+    private final PathRepository pathRepository;
+
+    public MediaResponse save(String userId, MediaRequest request) {
+        log.info("Saving media type: {} in adventure: {}", request.type(), request.adventureId());
+
+        Adventure adventure = adventureRepository.findById(request.adventureId())
+                .orElseThrow(() -> new IllegalArgumentException("Aventura nao encontrada"));
+
+        Path path = null;
+        if (nonNull(request.pathId())) {
+            path = pathRepository.findById(request.pathId())
+                    .orElseThrow(() -> new IllegalArgumentException("Caminho nao encontrado"));
+        }
+
+        Media media = mediaRepository.save(MediaMapper.toEntity(request, adventure, path, userId));
+
+        return MediaMapper.toResponse(media);
+    }
+
+    public Page<MediaResponse> getByAdventure(String adventureId, Pageable pageable) {
+        return mediaRepository.findByAdventureId(adventureId, pageable)
+                .map(MediaMapper::toResponse);
+    }
+
+    public Page<MediaResponse> getByPath(String pathId, Pageable pageable) {
+        return mediaRepository.findByPathId(pathId, pageable)
+                .map(MediaMapper::toResponse);
+    }
+
+    public void delete(String userId, String id) {
+        Media media = mediaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Midia nao encontrada"));
+
+        if (!userId.equals(media.getUserId())) {
+            throw new IllegalArgumentException("Voce nao e o dono desta midia");
+        }
+
+        mediaRepository.delete(media);
+        log.info("Media {} deleted", id);
+    }
+}

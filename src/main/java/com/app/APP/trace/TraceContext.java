@@ -17,13 +17,13 @@ public final class TraceContext {
     private TraceContext() {
     }
 
-    /** traceId atual da requisicao (do MDC), ou null fora de uma requisicao. */
-    public static String atual() {
+    /** Current traceId for the request (from MDC), or null outside a request. */
+    public static String current() {
         return MDC.get(MDC_KEY);
     }
 
-    /** Gera um traceId: inteiro aleatorio de 6 digitos (100000-999999). */
-    public static String gerar() {
+    /** Generates a traceId: random 6-digit integer (100000-999999). */
+    public static String generate() {
         return Integer.toString(ThreadLocalRandom.current().nextInt(100_000, 1_000_000));
     }
 }
