@@ -86,6 +86,12 @@ public class FollowerService {
         return new FollowStatusResponse(following, followsMe, following && followsMe);
     }
 
+    /** Follow check by ids — used by the Location service (SEGUIDORES visibility). */
+    @Transactional(readOnly = true)
+    public boolean isFollower(String followerId, String followedId) {
+        return followerRepository.existsByFollowerIdAndFollowedId(followerId, followedId);
+    }
+
     private String resolveId(String userCode) {
         return userRepository.findByUserCode(userCode)
                 .map(User::getId)

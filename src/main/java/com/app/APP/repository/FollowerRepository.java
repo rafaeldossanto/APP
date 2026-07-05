@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface FollowerRepository extends JpaRepository<Follower, String> {
 
     boolean existsByFollowerIdAndFollowedId(String followerId, String followedId);
@@ -30,4 +32,8 @@ public interface FollowerRepository extends JpaRepository<Follower, String> {
             + "FROM Follower f, User u WHERE u.id = f.followedId AND f.followerId = :userId",
             countQuery = "SELECT COUNT(f) FROM Follower f WHERE f.followerId = :userId")
     Page<PublicUserResponse> findFollowing(String userId, Pageable pageable);
+
+    /** Ids of everyone this user follows — the feed's author list. */
+    @Query("SELECT f.followedId FROM Follower f WHERE f.followerId = :userId")
+    List<String> findFollowedIds(String userId);
 }

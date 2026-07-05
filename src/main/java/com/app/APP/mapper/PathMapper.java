@@ -3,6 +3,7 @@ package com.app.APP.mapper;
 import com.app.APP.entity.Adventure;
 import com.app.APP.entity.Path;
 import com.app.APP.model.dto.request.PathRequest;
+import com.app.APP.model.dto.response.PathDiscoveryResponse;
 import com.app.APP.model.dto.response.PathResponse;
 import lombok.experimental.UtilityClass;
 
@@ -18,6 +19,16 @@ public class PathMapper {
                 .color(request.color())
                 .number(number)
                 .startedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static PathDiscoveryResponse toDiscoveryResponse(Path path) {
+        return PathDiscoveryResponse.builder()
+                .id(path.getId())
+                .adventureId(path.getAdventure().getId())
+                .userId(path.getAdventure().getUserId())
+                .destination(path.getAdventure().getDestination())
+                .color(path.getColor())
                 .build();
     }
 

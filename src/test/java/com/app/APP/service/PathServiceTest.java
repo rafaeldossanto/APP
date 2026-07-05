@@ -3,6 +3,7 @@ package com.app.APP.service;
 import com.app.APP.entity.Adventure;
 import com.app.APP.entity.Path;
 import com.app.APP.model.dto.request.PathRequest;
+import com.app.APP.model.dto.response.PathDiscoveryResponse;
 import com.app.APP.model.dto.response.PathResponse;
 import com.app.APP.repository.AdventureRepository;
 import com.app.APP.repository.PathRepository;
@@ -122,5 +123,29 @@ class PathServiceTest {
         Page<PathResponse> response = service.getByUser(PathStub.USER_ID, pageable);
 
         assertThat(response.getContent()).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("discover should map paths visible to the observer")
+    void shouldDiscoverVisiblePaths() {
+        List<String> ids = List.of(PathStub.ID, "caminho-privado");
+        when(pathRepository.findDiscoverableByIds(ids, "observador-1"))
+                .thenReturn(List.of(PathStub.aPath().build()));
+
+        List<PathDiscoveryResponse> response = service.discover("observador-1", ids);
+
+        assertThat(response).hasSize(1);
+        assertThat(response.get(0).id()).isEqualTo(PathStub.ID);
+        assertThat(response.get(0).adventureId()).isEqualTo(AdventureStub.ID);
+        assertThat(response.get(0).destination()).isEqualTo(AdventureStub.DESTINATION);
+    }
+
+    @Test
+    @DisplayName("discover should return empty without querying when there are no ids")
+    void shouldDiscoverNothingWithoutIds() {
+        List<PathDiscoveryResponse> response = service.discover("observador-1", List.of());
+
+        assertThat(response).isEmpty();
+        verify(pathRepository, never()).findDiscoverableByIds(any(), any());
     }
 }

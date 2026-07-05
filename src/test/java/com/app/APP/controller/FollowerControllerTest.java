@@ -116,4 +116,17 @@ class FollowerControllerTest {
                         .param("codigo", "trilheiro99"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("GET /seguidor/segue responde a checagem por ids (visibilidade SEGUIDORES)")
+    void shouldCheckFollowerByIds() throws Exception {
+        when(followerService.isFollower("usuario-2", USER_ID)).thenReturn(true);
+
+        mockMvc.perform(get("/seguidor/segue")
+                        .with(jwt().jwt(j -> j.subject(USER_ID).claim("codigoUsuario", "code-1")))
+                        .param("seguidorId", "usuario-2")
+                        .param("seguidoId", USER_ID))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(true));
+    }
 }

@@ -9,6 +9,7 @@ import com.app.APP.model.dto.response.AdventureResponse;
 import com.app.APP.model.enums.AdventureStatus;
 import com.app.APP.repository.AdventureRepository;
 import com.app.APP.repository.AdventureParticipantRepository;
+import com.app.APP.repository.FollowerRepository;
 import com.app.APP.repository.RegionRepository;
 import com.app.APP.util.OwnershipValidator;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.app.APP.mapper.AdventureMapper.toResponse;
 
@@ -30,6 +32,8 @@ public class AdventureService {
     private final AdventureRepository adventureRepository;
     private final AdventureParticipantRepository participantRepository;
     private final RegionRepository regionRepository;
+    private final FollowerRepository followerRepository;
+    private final AdventureAccessService accessService;
 
     @Transactional
     public AdventureResponse create(String userId, AdventureRequest request) {
@@ -67,13 +71,31 @@ public class AdventureService {
     }
 
     @Transactional(readOnly = true)
-    public AdventureResponse getById(String id) {
-        return toResponse(findById(id));
+    public AdventureResponse getById(String observerId, String id) {
+        Adventure adventure = findById(id);
+        accessService.validateView(observerId, adventure);
+        return toResponse(adventure);
     }
 
+    /** Own list comes whole; someone else's is filtered by each adventure's visibility. */
     @Transactional(readOnly = true)
-    public Page<AdventureResponse> getByUser(String userId, Pageable pageable) {
-        return adventureRepository.findByUserId(userId, pageable)
+    public Page<AdventureResponse> getByUser(String observerId, String userId, Pageable pageable) {
+        Page<Adventure> page = observerId.equals(userId)
+                ? adventureRepository.findByUserId(userId, pageable)
+                : adventureRepository.findVisibleByUser(userId, observerId, pageable);
+        return page.map(AdventureMapper::toResponse);
+    }
+
+    /**
+     * Feed: own adventures plus the visible ones from the users the observer
+     * follows, newest first. The sentinel keeps the IN clause valid when the
+     * observer follows nobody (same trick as RegionService.discover).
+     */
+    @Transactional(readOnly = true)
+    public Page<AdventureResponse> getFeed(String observerId, Pageable pageable) {
+        List<String> authors = followerRepository.findFollowedIds(observerId);
+        List<String> filter = authors.isEmpty() ? List.of("__sem_seguidos__") : authors;
+        return adventureRepository.findFeed(observerId, filter, pageable)
                 .map(AdventureMapper::toResponse);
     }
 

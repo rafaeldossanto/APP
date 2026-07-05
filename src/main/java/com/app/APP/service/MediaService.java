@@ -27,6 +27,7 @@ public class MediaService {
     private final MediaRepository mediaRepository;
     private final AdventureRepository adventureRepository;
     private final PathRepository pathRepository;
+    private final AdventureAccessService accessService;
 
     public MediaResponse save(String userId, MediaRequest request) {
         log.info("Saving media type: {} in adventure: {}", request.type(), request.adventureId());
@@ -46,13 +47,19 @@ public class MediaService {
     }
 
     @Transactional(readOnly = true)
-    public Page<MediaResponse> getByAdventure(String adventureId, Pageable pageable) {
+    public Page<MediaResponse> getByAdventure(String observerId, String adventureId, Pageable pageable) {
+        Adventure adventure = adventureRepository.findById(adventureId)
+                .orElseThrow(() -> new IllegalArgumentException("Aventura nao encontrada"));
+        accessService.validateView(observerId, adventure);
         return mediaRepository.findByAdventureId(adventureId, pageable)
                 .map(MediaMapper::toResponse);
     }
 
     @Transactional(readOnly = true)
-    public Page<MediaResponse> getByPath(String pathId, Pageable pageable) {
+    public Page<MediaResponse> getByPath(String observerId, String pathId, Pageable pageable) {
+        Path path = pathRepository.findById(pathId)
+                .orElseThrow(() -> new IllegalArgumentException("Caminho nao encontrado"));
+        accessService.validateView(observerId, path.getAdventure());
         return mediaRepository.findByPathId(pathId, pageable)
                 .map(MediaMapper::toResponse);
     }

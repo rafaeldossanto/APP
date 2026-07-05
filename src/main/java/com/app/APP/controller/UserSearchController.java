@@ -1,6 +1,7 @@
 package com.app.APP.controller;
 
 import com.app.APP.model.dto.response.PublicUserResponse;
+import com.app.APP.model.dto.response.UserSummaryResponse;
 import com.app.APP.service.UserSearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,5 +30,11 @@ public class UserSearchController {
     @GetMapping("/busca")
     public List<PublicUserResponse> autocomplete(@RequestParam String termo) {
         return userSearchService.autocomplete(termo);
+    }
+
+    /** Resolucao em lote de ids -> nome/codigo, para o BFF enriquecer respostas. */
+    @GetMapping("/resumo")
+    public List<UserSummaryResponse> getSummaries(@RequestParam("ids") List<String> ids) {
+        return userSearchService.getSummaries(ids);
     }
 }

@@ -29,13 +29,15 @@ public class MediaController {
     }
 
     @GetMapping("/aventura/{adventureId}")
-    public Page<MediaResponse> getByAdventure(@PathVariable String adventureId, Pageable pageable) {
-        return mediaService.getByAdventure(adventureId, pageable);
+    public Page<MediaResponse> getByAdventure(AuthenticatedUser user,
+                                              @PathVariable String adventureId, Pageable pageable) {
+        return mediaService.getByAdventure(user.id(), adventureId, pageable);
     }
 
     @GetMapping("/caminho/{pathId}")
-    public Page<MediaResponse> getByPath(@PathVariable String pathId, Pageable pageable) {
-        return mediaService.getByPath(pathId, pageable);
+    public Page<MediaResponse> getByPath(AuthenticatedUser user,
+                                         @PathVariable String pathId, Pageable pageable) {
+        return mediaService.getByPath(user.id(), pathId, pageable);
     }
 
     @DeleteMapping("/{id}")

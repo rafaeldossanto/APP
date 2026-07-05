@@ -33,13 +33,20 @@ public class AdventureController {
     }
 
     @GetMapping("/{id}")
-    public AdventureResponse getById(@PathVariable String id) {
-        return adventureService.getById(id);
+    public AdventureResponse getById(AuthenticatedUser user, @PathVariable String id) {
+        return adventureService.getById(user.id(), id);
     }
 
     @GetMapping("/usuario/{userId}")
-    public Page<AdventureResponse> getByUser(@PathVariable String userId, Pageable pageable) {
-        return adventureService.getByUser(userId, pageable);
+    public Page<AdventureResponse> getByUser(AuthenticatedUser user,
+                                             @PathVariable String userId, Pageable pageable) {
+        return adventureService.getByUser(user.id(), userId, pageable);
+    }
+
+    /** Feed: minhas aventuras + as visiveis de quem eu sigo, mais recentes primeiro. */
+    @GetMapping("/feed")
+    public Page<AdventureResponse> getFeed(AuthenticatedUser user, Pageable pageable) {
+        return adventureService.getFeed(user.id(), pageable);
     }
 
     @PatchMapping("/{id}/status")

@@ -58,4 +58,11 @@ public class FollowerController {
     public FollowStatusResponse status(AuthenticatedUser user, @RequestParam String codigo) {
         return followerService.status(user.id(), codigo);
     }
+
+    /** Follow check by ids — used by the Location service (SEGUIDORES visibility). */
+    @GetMapping("/segue")
+    public boolean isFollower(@RequestParam("seguidorId") String followerId,
+                              @RequestParam("seguidoId") String followedId) {
+        return followerService.isFollower(followerId, followedId);
+    }
 }

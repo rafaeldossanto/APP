@@ -2,6 +2,7 @@ package com.app.APP.service;
 
 import com.app.APP.entity.User;
 import com.app.APP.model.dto.response.PublicUserResponse;
+import com.app.APP.model.dto.response.UserSummaryResponse;
 import com.app.APP.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,18 @@ public class UserSearchService {
         return userRepository.findByUserCodePrefix(term).stream()
                 .limit(AUTOCOMPLETE_LIMIT)
                 .map(this::toPublic)
+                .toList();
+    }
+
+    /** Resolucao em lote de ids -> nome/codigo (BFF enriquece mapa, ao vivo e feed). */
+    @Transactional(readOnly = true)
+    public List<UserSummaryResponse> getSummaries(List<String> ids) {
+        return userRepository.findAllById(ids).stream()
+                .map(user -> UserSummaryResponse.builder()
+                        .id(user.getId())
+                        .name(user.getName())
+                        .userCode(user.getUserCode())
+                        .build())
                 .toList();
     }
 
