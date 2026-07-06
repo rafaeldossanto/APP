@@ -42,6 +42,8 @@ class MediaServiceTest {
     private AdventureRepository adventureRepository;
     @Mock
     private PathRepository pathRepository;
+    @Mock
+    private AdventureAccessService accessService;
 
     @InjectMocks
     private MediaService service;
@@ -109,10 +111,12 @@ class MediaServiceTest {
     @DisplayName("getByAdventure should map page")
     void shouldListByAdventure() {
         Pageable pageable = PageRequest.of(0, 10);
+        when(adventureRepository.findById(AdventureStub.ID))
+                .thenReturn(Optional.of(AdventureStub.anAdventure().build()));
         when(mediaRepository.findByAdventureId(AdventureStub.ID, pageable))
                 .thenReturn(new PageImpl<>(List.of(MediaStub.aMedia().build())));
 
-        Page<MediaResponse> response = service.getByAdventure(AdventureStub.ID, pageable);
+        Page<MediaResponse> response = service.getByAdventure(AdventureStub.USER_ID, AdventureStub.ID, pageable);
 
         assertThat(response.getContent()).hasSize(1);
         assertThat(response.getContent().get(0).adventureId()).isEqualTo(AdventureStub.ID);
@@ -122,10 +126,12 @@ class MediaServiceTest {
     @DisplayName("getByPath should map page")
     void shouldListByPath() {
         Pageable pageable = PageRequest.of(0, 10);
+        when(pathRepository.findById(PathStub.ID))
+                .thenReturn(Optional.of(PathStub.aPath().build()));
         when(mediaRepository.findByPathId(PathStub.ID, pageable))
                 .thenReturn(new PageImpl<>(List.of(MediaStub.aMedia().build())));
 
-        Page<MediaResponse> response = service.getByPath(PathStub.ID, pageable);
+        Page<MediaResponse> response = service.getByPath(PathStub.USER_ID, PathStub.ID, pageable);
 
         assertThat(response.getContent()).hasSize(1);
     }

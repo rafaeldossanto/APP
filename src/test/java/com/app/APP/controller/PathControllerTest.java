@@ -109,7 +109,7 @@ class PathControllerTest {
     @DisplayName("GET /caminho/aventura/{adventureId} lista caminhos da aventura")
     void shouldListByAdventure() throws Exception {
         Page<PathResponse> page = new PageImpl<>(List.of(responseStub()));
-        when(pathService.getByAdventure(eq(ADVENTURE_ID), any(Pageable.class))).thenReturn(page);
+        when(pathService.getByAdventure(eq(USER_ID), eq(ADVENTURE_ID), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/caminho/aventura/{adventureId}", ADVENTURE_ID)
                         .with(jwt().jwt(j -> j.subject(USER_ID).claim("codigoUsuario", "code-1"))))

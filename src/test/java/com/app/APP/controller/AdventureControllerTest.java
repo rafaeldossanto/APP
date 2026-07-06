@@ -97,7 +97,7 @@ class AdventureControllerTest {
     @Test
     @DisplayName("GET /aventura/{id} retorna a aventura existente")
     void shouldGetAdventureById() throws Exception {
-        when(adventureService.getById(ADVENTURE_ID)).thenReturn(responseStub());
+        when(adventureService.getById(USER_ID, ADVENTURE_ID)).thenReturn(responseStub());
 
         mockMvc.perform(get("/aventura/{id}", ADVENTURE_ID)
                         .with(jwt().jwt(j -> j.subject(USER_ID).claim("codigoUsuario", "code-1"))))
@@ -108,7 +108,7 @@ class AdventureControllerTest {
     @Test
     @DisplayName("GET /aventura/{id} retorna 400 quando nao encontrada")
     void shouldReturn400WhenNotFound() throws Exception {
-        when(adventureService.getById("inexistente"))
+        when(adventureService.getById(USER_ID, "inexistente"))
                 .thenThrow(new IllegalArgumentException("Aventura nao encontrada"));
 
         mockMvc.perform(get("/aventura/{id}", "inexistente")
@@ -120,7 +120,7 @@ class AdventureControllerTest {
     @DisplayName("GET /aventura/usuario/{userId} retorna pagina de aventuras")
     void shouldListByUser() throws Exception {
         Page<AdventureResponse> page = new PageImpl<>(List.of(responseStub()));
-        when(adventureService.getByUser(eq(USER_ID), any(Pageable.class))).thenReturn(page);
+        when(adventureService.getByUser(eq(USER_ID), eq(USER_ID), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/aventura/usuario/{userId}", USER_ID)
                         .with(jwt().jwt(j -> j.subject(USER_ID).claim("codigoUsuario", "code-1"))))

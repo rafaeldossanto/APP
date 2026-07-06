@@ -80,7 +80,7 @@ class MediaControllerTest {
     @DisplayName("GET /midia/aventura/{adventureId} lista midias da aventura")
     void shouldListByAdventure() throws Exception {
         Page<MediaResponse> page = new PageImpl<>(List.of(responseStub()));
-        when(mediaService.getByAdventure(eq(ADVENTURE_ID), any(Pageable.class))).thenReturn(page);
+        when(mediaService.getByAdventure(eq(USER_ID), eq(ADVENTURE_ID), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/midia/aventura/{adventureId}", ADVENTURE_ID)
                         .with(jwt().jwt(j -> j.subject(USER_ID).claim("codigoUsuario", "code-1"))))

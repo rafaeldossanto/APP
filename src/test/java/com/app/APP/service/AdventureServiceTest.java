@@ -42,6 +42,10 @@ class AdventureServiceTest {
     private AdventureParticipantRepository participantRepository;
     @Mock
     private RegionRepository regionRepository;
+    @Mock
+    private com.app.APP.repository.FollowerRepository followerRepository;
+    @Mock
+    private AdventureAccessService accessService;
 
     @InjectMocks
     private AdventureService service;
@@ -84,7 +88,7 @@ class AdventureServiceTest {
         Adventure adventure = AdventureStub.anAdventure().build();
         when(adventureRepository.findById(AdventureStub.ID)).thenReturn(Optional.of(adventure));
 
-        AdventureResponse response = service.getById(AdventureStub.ID);
+        AdventureResponse response = service.getById(AdventureStub.USER_ID, AdventureStub.ID);
 
         assertThat(response.id()).isEqualTo(AdventureStub.ID);
     }
@@ -94,7 +98,7 @@ class AdventureServiceTest {
     void shouldFailGetByIdNotFound() {
         when(adventureRepository.findById("inexistente")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.getById("inexistente"))
+        assertThatThrownBy(() -> service.getById(AdventureStub.USER_ID, "inexistente"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Aventura nao encontrada");
     }
@@ -106,7 +110,7 @@ class AdventureServiceTest {
         when(adventureRepository.findByUserId(AdventureStub.USER_ID, pageable))
                 .thenReturn(new PageImpl<>(List.of(AdventureStub.anAdventure().build())));
 
-        Page<AdventureResponse> response = service.getByUser(AdventureStub.USER_ID, pageable);
+        Page<AdventureResponse> response = service.getByUser(AdventureStub.USER_ID, AdventureStub.USER_ID, pageable);
 
         assertThat(response.getContent()).hasSize(1);
         assertThat(response.getContent().get(0).userId()).isEqualTo(AdventureStub.USER_ID);

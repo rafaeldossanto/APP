@@ -39,6 +39,8 @@ class PathServiceTest {
     private PathRepository pathRepository;
     @Mock
     private AdventureRepository adventureRepository;
+    @Mock
+    private AdventureAccessService accessService;
 
     @InjectMocks
     private PathService service;
@@ -104,10 +106,12 @@ class PathServiceTest {
     @DisplayName("getByAdventure should map page")
     void shouldListByAdventure() {
         Pageable pageable = PageRequest.of(0, 10);
+        when(adventureRepository.findById(AdventureStub.ID))
+                .thenReturn(Optional.of(AdventureStub.anAdventure().build()));
         when(pathRepository.findByAdventureId(AdventureStub.ID, pageable))
                 .thenReturn(new PageImpl<>(List.of(PathStub.aPath().build())));
 
-        Page<PathResponse> response = service.getByAdventure(AdventureStub.ID, pageable);
+        Page<PathResponse> response = service.getByAdventure(PathStub.USER_ID, AdventureStub.ID, pageable);
 
         assertThat(response.getContent()).hasSize(1);
         assertThat(response.getContent().get(0).adventureId()).isEqualTo(AdventureStub.ID);
@@ -120,7 +124,7 @@ class PathServiceTest {
         when(pathRepository.findByUserId(PathStub.USER_ID, pageable))
                 .thenReturn(new PageImpl<>(List.of(PathStub.aPath().build())));
 
-        Page<PathResponse> response = service.getByUser(PathStub.USER_ID, pageable);
+        Page<PathResponse> response = service.getByUser(PathStub.USER_ID, PathStub.USER_ID, pageable);
 
         assertThat(response.getContent()).hasSize(1);
     }
