@@ -129,4 +129,16 @@ class FollowerControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value(true));
     }
+
+    @Test
+    @DisplayName("GET /seguidor/seguindo-ids lista ids de quem o autenticado segue")
+    void shouldListFollowingIds() throws Exception {
+        when(followerService.followingIds(USER_ID)).thenReturn(List.of("usuario-2", "usuario-3"));
+
+        mockMvc.perform(get("/seguidor/seguindo-ids")
+                        .with(jwt().jwt(j -> j.subject(USER_ID).claim("codigoUsuario", "code-1"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0]").value("usuario-2"));
+    }
 }

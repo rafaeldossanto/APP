@@ -314,4 +314,17 @@ class FriendshipServiceTest {
 
         assertThat(service.areFriends(FriendshipStub.REQUESTER_ID, FriendshipStub.RECEIVER_ID)).isFalse();
     }
+
+    // ---- friendIds ----
+
+    @Test
+    @DisplayName("friendIds should return only ACEITA relations ids")
+    void shouldListFriendIds() {
+        when(friendshipRepository.findFriendIds(FriendshipStub.REQUESTER_ID, FriendshipStatus.ACEITA))
+                .thenReturn(List.of("usuario-2", "usuario-3"));
+
+        List<String> ids = service.friendIds(FriendshipStub.REQUESTER_ID);
+
+        assertThat(ids).containsExactly("usuario-2", "usuario-3");
+    }
 }

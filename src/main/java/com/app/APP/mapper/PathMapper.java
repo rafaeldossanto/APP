@@ -8,12 +8,14 @@ import com.app.APP.model.dto.response.PathResponse;
 import lombok.experimental.UtilityClass;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @UtilityClass
 public class PathMapper {
 
     public static Path toEntity(PathRequest request, Adventure adventure, int number, String userId) {
         return Path.builder()
+                .id(UUID.randomUUID().toString())
                 .adventure(adventure)
                 .userId(userId)
                 .color(request.color())

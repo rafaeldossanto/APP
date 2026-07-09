@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/amizade")
 @RequiredArgsConstructor
@@ -76,5 +78,11 @@ public class FriendshipController {
     @GetMapping("/sao-amigos")
     public boolean areFriends(@RequestParam String a, @RequestParam String b) {
         return friendshipService.areFriends(a, b);
+    }
+
+    /** Ids dos amigos do autenticado — checagem em lote do loc (lista ao vivo). */
+    @GetMapping("/amigos-ids")
+    public List<String> friendIds(AuthenticatedUser user) {
+        return friendshipService.friendIds(user.id());
     }
 }

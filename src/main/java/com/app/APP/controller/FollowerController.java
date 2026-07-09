@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * Target always identified by userCode (public handle): in the body for follow/unfollow,
  * in ?codigo= for GETs. Avoids '#' in the path. The service resolves the code to an id.
@@ -64,5 +66,11 @@ public class FollowerController {
     public boolean isFollower(@RequestParam("seguidorId") String followerId,
                               @RequestParam("seguidoId") String followedId) {
         return followerService.isFollower(followerId, followedId);
+    }
+
+    /** Ids de quem o autenticado segue — checagem em lote do loc (lista ao vivo). */
+    @GetMapping("/seguindo-ids")
+    public List<String> followingIds(AuthenticatedUser user) {
+        return followerService.followingIds(user.id());
     }
 }

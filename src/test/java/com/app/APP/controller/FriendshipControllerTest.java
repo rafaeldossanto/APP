@@ -127,4 +127,16 @@ class FriendshipControllerTest {
                         .param("b", "usuario-2"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("GET /amizade/amigos-ids lista ids dos amigos do autenticado")
+    void shouldListFriendIds() throws Exception {
+        when(friendshipService.friendIds(USER_ID)).thenReturn(List.of("usuario-2", "usuario-3"));
+
+        mockMvc.perform(get("/amizade/amigos-ids")
+                        .with(jwt().jwt(j -> j.subject(USER_ID).claim("codigoUsuario", "code-1"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0]").value("usuario-2"));
+    }
 }

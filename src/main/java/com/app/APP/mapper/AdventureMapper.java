@@ -7,6 +7,7 @@ import com.app.APP.model.dto.response.AdventureResponse;
 import lombok.experimental.UtilityClass;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static com.app.APP.mapper.MapperUtils.idOrNull;
 
@@ -15,6 +16,7 @@ public class AdventureMapper {
 
     public static Adventure toEntity(AdventureRequest request, Region region, String userId) {
         return Adventure.builder()
+                .id(UUID.randomUUID().toString())
                 .userId(userId)
                 .region(region)
                 .destination(request.destination())

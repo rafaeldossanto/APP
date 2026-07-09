@@ -2,6 +2,7 @@ package com.app.APP.controller;
 
 import com.app.APP.auth.WebConfig;
 import com.app.APP.model.dto.response.PublicUserResponse;
+import com.app.APP.model.dto.response.UserSummaryResponse;
 import com.app.APP.service.UserSearchService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -84,5 +85,21 @@ class UserSearchControllerTest {
                         .param("termo", "xyzxyz"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    @Test
+    @DisplayName("GET /usuario/resumo-codigo retorna resumo com o id interno")
+    void shouldFindSummaryByCode() throws Exception {
+        when(userSearchService.findSummaryByCode("trilheiro42"))
+                .thenReturn(UserSummaryResponse.builder()
+                        .id("usuario-1").name("Rafael").userCode("trilheiro42").build());
+
+        mockMvc.perform(get("/usuario/resumo-codigo")
+                        .with(jwt().jwt(j -> j.subject("usuario-1").claim("codigoUsuario", "code-1")))
+                        .param("codigo", "trilheiro42"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("usuario-1"))
+                .andExpect(jsonPath("$.nome").value("Rafael"))
+                .andExpect(jsonPath("$.codigoUsuario").value("trilheiro42"));
     }
 }

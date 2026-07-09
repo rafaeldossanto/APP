@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.app.APP.mapper.FriendshipMapper.toResponse;
 
@@ -150,6 +151,12 @@ public class FriendshipService {
         return friendshipRepository.findRelation(userA, userB)
                 .filter(f -> FriendshipStatus.ACEITA.equals(f.getStatus()))
                 .isPresent();
+    }
+
+    /** Ids of the user's friends — batch check for the location service (live list). */
+    @Transactional(readOnly = true)
+    public List<String> friendIds(String userId) {
+        return friendshipRepository.findFriendIds(userId, FriendshipStatus.ACEITA);
     }
 
     private boolean followEachOther(String a, String b) {

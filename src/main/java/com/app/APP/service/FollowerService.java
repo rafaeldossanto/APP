@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -90,6 +91,12 @@ public class FollowerService {
     @Transactional(readOnly = true)
     public boolean isFollower(String followerId, String followedId) {
         return followerRepository.existsByFollowerIdAndFollowedId(followerId, followedId);
+    }
+
+    /** Ids de quem o usuario segue — checagem em lote do loc (lista ao vivo). */
+    @Transactional(readOnly = true)
+    public List<String> followingIds(String userId) {
+        return followerRepository.findFollowedIds(userId);
     }
 
     private String resolveId(String userCode) {

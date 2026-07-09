@@ -2,6 +2,7 @@ package com.app.APP.service;
 
 import com.app.APP.entity.User;
 import com.app.APP.model.dto.response.PublicUserResponse;
+import com.app.APP.model.dto.response.UserSummaryResponse;
 import com.app.APP.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,6 +55,30 @@ class UserSearchServiceTest {
         when(userRepository.findByUserCode("inexistente#9")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.findByCode("inexistente#9"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("nao encontrado");
+    }
+
+    @Test
+    @DisplayName("findSummaryByCode should return the summary with the internal id")
+    void shouldFindSummaryByCode() {
+        User u = user("rafael#1", "Rafael");
+        ReflectionTestUtils.setField(u, "id", "usuario-1");
+        when(userRepository.findByUserCode("rafael#1")).thenReturn(Optional.of(u));
+
+        UserSummaryResponse response = service.findSummaryByCode("rafael#1");
+
+        assertThat(response.id()).isEqualTo("usuario-1");
+        assertThat(response.name()).isEqualTo("Rafael");
+        assertThat(response.userCode()).isEqualTo("rafael#1");
+    }
+
+    @Test
+    @DisplayName("findSummaryByCode should fail when user does not exist")
+    void shouldFailSummaryNotFound() {
+        when(userRepository.findByUserCode("inexistente#9")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.findSummaryByCode("inexistente#9"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("nao encontrado");
     }

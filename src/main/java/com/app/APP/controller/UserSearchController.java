@@ -37,4 +37,10 @@ public class UserSearchController {
     public List<UserSummaryResponse> getSummaries(@RequestParam("ids") List<String> ids) {
         return userSearchService.getSummaries(ids);
     }
+
+    /** Resumo (com id) pelo codigo publico — em ?codigo= para nao levar '#' no path. */
+    @GetMapping("/resumo-codigo")
+    public UserSummaryResponse findSummaryByCode(@RequestParam("codigo") String userCode) {
+        return userSearchService.findSummaryByCode(userCode);
+    }
 }
