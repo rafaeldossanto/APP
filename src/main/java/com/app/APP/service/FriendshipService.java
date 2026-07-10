@@ -47,6 +47,10 @@ public class FriendshipService {
     }
 
     public FriendshipResponse respond(String userId, String friendshipId, FriendshipStatus status) {
+        if (!FriendshipStatus.ACEITA.equals(status) && !FriendshipStatus.RECUSADA.equals(status)) {
+            throw new IllegalArgumentException("Resposta invalida: aceite ou recuse a solicitacao");
+        }
+
         Friendship friendship = findById(friendshipId);
 
         if (!userId.equals(friendship.getReceiverId())) {
@@ -93,8 +97,10 @@ public class FriendshipService {
 
     /**
      * Blocks a user: reuses the existing relation (if any) or creates a new one,
-     * marking it as BLOQUEADA and recording who did the blocking.
+     * marking it as BLOQUEADA and recording who did the blocking. Existing follows
+     * on both sides are removed — a block severs the social link entirely.
      */
+    @Transactional
     public FriendshipResponse block(String blockerId, FriendshipRequest request) {
         log.info("User {} blocking {}", blockerId, request.receiverCode());
 
@@ -106,6 +112,9 @@ public class FriendshipService {
         friendship.setStatus(FriendshipStatus.BLOQUEADA);
         friendship.setBlockedBy(blockerId);
         friendship.setRespondedAt(LocalDateTime.now());
+
+        followerRepository.deleteByFollowerIdAndFollowedId(blockerId, receiverId);
+        followerRepository.deleteByFollowerIdAndFollowedId(receiverId, blockerId);
 
         return toResponse(friendshipRepository.save(friendship));
     }

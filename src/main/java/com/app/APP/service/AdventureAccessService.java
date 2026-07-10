@@ -46,4 +46,16 @@ public class AdventureAccessService {
                 .map(adventure -> canView(observerId, adventure))
                 .orElse(false);
     }
+
+    /** Escrita de conteudo (caminho, ponto, midia): dono ou participante da aventura. */
+    public boolean canContribute(String userId, Adventure adventure) {
+        return adventure.getUserId().equals(userId)
+                || participantRepository.existsByAdventureIdAndUserId(adventure.getId(), userId);
+    }
+
+    public void validateContribute(String userId, Adventure adventure) {
+        if (!canContribute(userId, adventure)) {
+            throw new IllegalArgumentException("Voce nao participa desta aventura");
+        }
+    }
 }

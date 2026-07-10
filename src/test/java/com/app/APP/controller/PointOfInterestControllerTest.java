@@ -92,7 +92,7 @@ class PointOfInterestControllerTest {
     @Test
     @DisplayName("GET /ponto-interesse/{id} retorna ponto existente")
     void shouldGetById() throws Exception {
-        when(pointOfInterestService.getById(POINT_ID)).thenReturn(responseStub());
+        when(pointOfInterestService.getById(USER_ID, POINT_ID)).thenReturn(responseStub());
 
         mockMvc.perform(get("/ponto-interesse/{id}", POINT_ID)
                         .with(jwt().jwt(j -> j.subject(USER_ID).claim("codigoUsuario", "code-1"))))
@@ -104,7 +104,7 @@ class PointOfInterestControllerTest {
     @DisplayName("GET /ponto-interesse/caminho/{pathId} lista pontos do caminho")
     void shouldListByPath() throws Exception {
         Page<PointOfInterestResponse> page = new PageImpl<>(List.of(responseStub()));
-        when(pointOfInterestService.getByPath(eq(PATH_ID), any(Pageable.class))).thenReturn(page);
+        when(pointOfInterestService.getByPath(eq(USER_ID), eq(PATH_ID), any(Pageable.class))).thenReturn(page);
 
         mockMvc.perform(get("/ponto-interesse/caminho/{pathId}", PATH_ID)
                         .with(jwt().jwt(j -> j.subject(USER_ID).claim("codigoUsuario", "code-1"))))

@@ -28,6 +28,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -103,6 +104,39 @@ class MediaServiceTest {
         assertThatThrownBy(() -> service.save(MediaStub.USER_ID, request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Caminho nao encontrado");
+
+        verify(mediaRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("save should fail when user is not owner nor participant of the adventure")
+    void shouldFailSaveWithoutBond() {
+        MediaRequest request = MediaStub.aRequest();
+        Adventure adventure = AdventureStub.anAdventure().build();
+        when(adventureRepository.findById(request.adventureId())).thenReturn(Optional.of(adventure));
+        doThrow(new IllegalArgumentException("Voce nao participa desta aventura"))
+                .when(accessService).validateContribute("intruso", adventure);
+
+        assertThatThrownBy(() -> service.save("intruso", request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("nao participa");
+
+        verify(mediaRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("save should fail when the path belongs to another adventure")
+    void shouldFailSavePathFromAnotherAdventure() {
+        MediaRequest request = MediaStub.aRequest();
+        Adventure adventure = AdventureStub.anAdventure().build();
+        Adventure other = AdventureStub.anAdventure().id("aventura-2").build();
+        Path pathFromOther = PathStub.aPath().adventure(other).build();
+        when(adventureRepository.findById(request.adventureId())).thenReturn(Optional.of(adventure));
+        when(pathRepository.findById(request.pathId())).thenReturn(Optional.of(pathFromOther));
+
+        assertThatThrownBy(() -> service.save(MediaStub.USER_ID, request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("nao pertence a essa aventura");
 
         verify(mediaRepository, never()).save(any());
     }

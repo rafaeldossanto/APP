@@ -63,9 +63,9 @@ public class AdventureController {
     }
 
     @PostMapping("/{id}/participante")
-    public void addParticipant(@PathVariable String id,
+    public void addParticipant(AuthenticatedUser user, @PathVariable String id,
                                @RequestParam String userId) {
-        adventureService.addParticipant(id, userId);
+        adventureService.addParticipant(user.id(), id, userId);
     }
 
     @DeleteMapping("/{id}")

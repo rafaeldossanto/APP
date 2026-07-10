@@ -29,16 +29,21 @@ public class MediaService {
     private final PathRepository pathRepository;
     private final AdventureAccessService accessService;
 
+    @Transactional
     public MediaResponse save(String userId, MediaRequest request) {
         log.info("Saving media type: {} in adventure: {}", request.type(), request.adventureId());
 
         Adventure adventure = adventureRepository.findById(request.adventureId())
                 .orElseThrow(() -> new IllegalArgumentException("Aventura nao encontrada"));
+        accessService.validateContribute(userId, adventure);
 
         Path path = null;
         if (nonNull(request.pathId())) {
             path = pathRepository.findById(request.pathId())
                     .orElseThrow(() -> new IllegalArgumentException("Caminho nao encontrado"));
+            if (!path.getAdventure().getId().equals(adventure.getId())) {
+                throw new IllegalArgumentException("O caminho nao pertence a essa aventura");
+            }
         }
 
         Media media = mediaRepository.save(MediaMapper.toEntity(request, adventure, path, userId));

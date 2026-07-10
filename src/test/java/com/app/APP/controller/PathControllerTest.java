@@ -96,7 +96,7 @@ class PathControllerTest {
                 .id(PATH_ID).adventureId(ADVENTURE_ID).userId(USER_ID)
                 .color(Color.ROXO).number(1).startedAt(LocalDateTime.now())
                 .finishedAt(LocalDateTime.now()).totalDistanceKm(12.5).build();
-        when(pathService.finish(eq(PATH_ID), eq(12.5))).thenReturn(finished);
+        when(pathService.finish(eq(USER_ID), eq(PATH_ID), eq(12.5))).thenReturn(finished);
 
         mockMvc.perform(patch("/caminho/{id}/finalizar", PATH_ID)
                         .with(jwt().jwt(j -> j.subject(USER_ID).claim("codigoUsuario", "code-1")))

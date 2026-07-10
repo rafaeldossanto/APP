@@ -27,6 +27,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -80,16 +81,45 @@ class PathServiceTest {
     }
 
     @Test
+    @DisplayName("start should fail when user is not owner nor participant of the adventure")
+    void shouldFailStartWithoutBond() {
+        PathRequest request = PathStub.aRequest();
+        Adventure adventure = AdventureStub.anAdventure().build();
+        when(adventureRepository.findById(request.adventureId())).thenReturn(Optional.of(adventure));
+        doThrow(new IllegalArgumentException("Voce nao participa desta aventura"))
+                .when(accessService).validateContribute("intruso", adventure);
+
+        assertThatThrownBy(() -> service.start("intruso", request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("nao participa");
+
+        verify(pathRepository, never()).save(any());
+    }
+
+    @Test
     @DisplayName("finish should record end date and distance")
     void shouldFinishPath() {
         Path path = PathStub.aPath().build();
         when(pathRepository.findById(PathStub.ID)).thenReturn(Optional.of(path));
         when(pathRepository.save(any(Path.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        PathResponse response = service.finish(PathStub.ID, 12.5);
+        PathResponse response = service.finish(PathStub.USER_ID, PathStub.ID, 12.5);
 
         assertThat(response.totalDistanceKm()).isEqualTo(12.5);
         assertThat(response.finishedAt()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("finish should fail when caller does not own the path")
+    void shouldFailFinishNotOwner() {
+        Path path = PathStub.aPath().build();
+        when(pathRepository.findById(PathStub.ID)).thenReturn(Optional.of(path));
+
+        assertThatThrownBy(() -> service.finish("intruso", PathStub.ID, 12.5))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("nao e o dono deste caminho");
+
+        verify(pathRepository, never()).save(any());
     }
 
     @Test
@@ -97,7 +127,7 @@ class PathServiceTest {
     void shouldFailFinishNotFound() {
         when(pathRepository.findById("inexistente")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.finish("inexistente", 1.0))
+        assertThatThrownBy(() -> service.finish(PathStub.USER_ID, "inexistente", 1.0))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Caminho nao encontrado");
     }

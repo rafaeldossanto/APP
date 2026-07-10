@@ -33,23 +33,31 @@ public class PointOfInterestService {
     private final PointOfInterestRepository pointRepository;
     private final EvidenceRepository evidenceRepository;
     private final PathRepository pathRepository;
+    private final AdventureAccessService accessService;
 
     private static final double MAX_DISTANCE_METERS = 50.0;
 
+    @Transactional
     public PointOfInterestResponse create(String userId, PointOfInterestRequest request) {
         log.info("Creating point of interest type: {}", request.type());
 
         Path path = pathRepository.findById(request.pathId())
                 .orElseThrow(() -> new IllegalArgumentException("Caminho nao encontrado"));
+        accessService.validateContribute(userId, path.getAdventure());
 
         PointOfInterest point = pointRepository.save(PointOfInterestMapper.toEntity(request, path, userId));
 
-        return PointOfInterestMapper.toResponse(point, 1);
+        return PointOfInterestMapper.toResponse(point, calculateLevel(point, 0));
     }
 
+    @Transactional
     public EvidenceResponse addEvidence(String userId, EvidenceRequest request) {
         PointOfInterest point = pointRepository.findById(request.pointId())
                 .orElseThrow(() -> new IllegalArgumentException("Ponto nao encontrado"));
+
+        // Quem nao pode ver o ponto tambem nao evidencia — sem o gate, o erro de
+        // distancia permitiria trilaterar a posicao de um ponto privado.
+        accessService.validateView(userId, point.getPath().getAdventure());
 
         double distance = GeoUtils.distanciaMetros(
                 point.getLatitude(), point.getLongitude(),
@@ -70,14 +78,18 @@ public class PointOfInterestService {
     }
 
     @Transactional(readOnly = true)
-    public PointOfInterestResponse getById(String id) {
+    public PointOfInterestResponse getById(String observerId, String id) {
         PointOfInterest point = pointRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Ponto nao encontrado"));
+        accessService.validateView(observerId, point.getPath().getAdventure());
         return PointOfInterestMapper.toResponse(point, calculateLevel(point));
     }
 
     @Transactional(readOnly = true)
-    public Page<PointOfInterestResponse> getByPath(String pathId, Pageable pageable) {
+    public Page<PointOfInterestResponse> getByPath(String observerId, String pathId, Pageable pageable) {
+        if (!accessService.canViewPath(observerId, pathId)) {
+            throw new IllegalArgumentException("Caminho nao encontrado ou sem acesso");
+        }
         Page<PointOfInterest> page = pointRepository.findByPathId(pathId, pageable);
 
         Map<String, Long> validatedPerPoint = countValidatedInBatch(page.getContent());

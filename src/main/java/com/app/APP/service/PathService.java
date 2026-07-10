@@ -8,6 +8,7 @@ import com.app.APP.model.dto.response.PathDiscoveryResponse;
 import com.app.APP.model.dto.response.PathResponse;
 import com.app.APP.repository.AdventureRepository;
 import com.app.APP.repository.PathRepository;
+import com.app.APP.util.OwnershipValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,15 +35,17 @@ public class PathService {
 
         Adventure adventure = adventureRepository.findById(request.adventureId())
                 .orElseThrow(() -> new IllegalArgumentException("Aventura nao encontrada"));
+        accessService.validateContribute(userId, adventure);
 
         int number = pathRepository.countByAdventureId(request.adventureId()) + 1;
 
         return toResponse(pathRepository.save(PathMapper.toEntity(request, adventure, number, userId)));
     }
 
-    public PathResponse finish(String id, Double totalDistanceKm) {
+    public PathResponse finish(String userId, String id, Double totalDistanceKm) {
         log.info("Finishing path: {}", id);
         Path path = findById(id);
+        OwnershipValidator.requireOwner(userId, path.getUserId(), "Voce nao e o dono deste caminho");
 
         path.setFinishedAt(LocalDateTime.now());
         path.setTotalDistanceKm(totalDistanceKm);

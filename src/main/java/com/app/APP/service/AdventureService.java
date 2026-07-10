@@ -107,8 +107,9 @@ public class AdventureService {
         return toResponse(adventureRepository.save(adventure));
     }
 
-    public void addParticipant(String adventureId, String userId) {
-        Adventure adventure = findById(adventureId);
+    /** Only the owner can invite participants — participation grants read access. */
+    public void addParticipant(String ownerId, String adventureId, String userId) {
+        Adventure adventure = findOwner(ownerId, adventureId);
 
         if (participantRepository.existsByAdventureIdAndUserId(adventureId, userId)) {
             throw new IllegalArgumentException("Usuario ja participa dessa aventura");

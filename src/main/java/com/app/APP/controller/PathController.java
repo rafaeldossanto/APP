@@ -33,9 +33,9 @@ public class PathController {
     }
 
     @PatchMapping("/{id}/finalizar")
-    public PathResponse finish(@PathVariable String id,
+    public PathResponse finish(AuthenticatedUser user, @PathVariable String id,
                                @RequestParam Double totalDistanceKm) {
-        return pathService.finish(id, totalDistanceKm);
+        return pathService.finish(user.id(), id, totalDistanceKm);
     }
 
     @GetMapping("/aventura/{adventureId}")

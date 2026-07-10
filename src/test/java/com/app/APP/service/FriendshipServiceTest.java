@@ -143,6 +143,22 @@ class FriendshipServiceTest {
         verify(friendshipRepository, never()).save(any());
     }
 
+    @Test
+    @DisplayName("respond should only accept ACEITA or RECUSADA")
+    void shouldFailRespondInvalidStatus() {
+        // BLOQUEADA via respond criaria um bloqueio sem blockedBy, que ninguem
+        // conseguiria desbloquear; bloquear tem endpoint proprio.
+        assertThatThrownBy(() -> service.respond(FriendshipStub.RECEIVER_ID, FriendshipStub.ID, FriendshipStatus.BLOQUEADA))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Resposta invalida");
+
+        assertThatThrownBy(() -> service.respond(FriendshipStub.RECEIVER_ID, FriendshipStub.ID, FriendshipStatus.PENDENTE))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Resposta invalida");
+
+        verify(friendshipRepository, never()).save(any());
+    }
+
     // ---- cancelRequest / unfriend ----
 
     @Test
@@ -208,6 +224,9 @@ class FriendshipServiceTest {
 
         assertThat(response.status()).isEqualTo(FriendshipStatus.BLOQUEADA);
         assertThat(response.blockedBy()).isEqualTo(FriendshipStub.REQUESTER_ID);
+        // O bloqueio corta o vinculo social: follows dos dois lados caem.
+        verify(followerRepository).deleteByFollowerIdAndFollowedId(FriendshipStub.REQUESTER_ID, FriendshipStub.RECEIVER_ID);
+        verify(followerRepository).deleteByFollowerIdAndFollowedId(FriendshipStub.RECEIVER_ID, FriendshipStub.REQUESTER_ID);
     }
 
     @Test

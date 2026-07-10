@@ -130,18 +130,33 @@ class AdventureServiceTest {
     }
 
     @Test
-    @DisplayName("addParticipant should persist when not yet participating")
+    @DisplayName("addParticipant should persist when owner invites a new participant")
     void shouldAddParticipant() {
         Adventure adventure = AdventureStub.anAdventure().build();
         when(adventureRepository.findById(AdventureStub.ID)).thenReturn(Optional.of(adventure));
         when(participantRepository.existsByAdventureIdAndUserId(AdventureStub.ID, "usuario-9"))
                 .thenReturn(false);
 
-        service.addParticipant(AdventureStub.ID, "usuario-9");
+        service.addParticipant(AdventureStub.USER_ID, AdventureStub.ID, "usuario-9");
 
         ArgumentCaptor<AdventureParticipant> captor = ArgumentCaptor.forClass(AdventureParticipant.class);
         verify(participantRepository).save(captor.capture());
         assertThat(captor.getValue().getUserId()).isEqualTo("usuario-9");
+    }
+
+    @Test
+    @DisplayName("addParticipant should fail when caller does not own the adventure")
+    void shouldFailAddParticipantNotOwner() {
+        Adventure adventure = AdventureStub.anAdventure().build();
+        when(adventureRepository.findById(AdventureStub.ID)).thenReturn(Optional.of(adventure));
+
+        // Sem o gate de dono, qualquer um se adicionaria a uma aventura SO_GRUPO
+        // e ganharia acesso de leitura a ela.
+        assertThatThrownBy(() -> service.addParticipant("intruso", AdventureStub.ID, "intruso"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("nao e o dono");
+
+        verify(participantRepository, never()).save(any());
     }
 
     @Test
@@ -152,7 +167,7 @@ class AdventureServiceTest {
         when(participantRepository.existsByAdventureIdAndUserId(AdventureStub.ID, "usuario-9"))
                 .thenReturn(true);
 
-        assertThatThrownBy(() -> service.addParticipant(AdventureStub.ID, "usuario-9"))
+        assertThatThrownBy(() -> service.addParticipant(AdventureStub.USER_ID, AdventureStub.ID, "usuario-9"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("ja participa");
 

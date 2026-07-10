@@ -30,13 +30,14 @@ public class PointOfInterestController {
     }
 
     @GetMapping("/{id}")
-    public PointOfInterestResponse getById(@PathVariable String id) {
-        return pointOfInterestService.getById(id);
+    public PointOfInterestResponse getById(AuthenticatedUser user, @PathVariable String id) {
+        return pointOfInterestService.getById(user.id(), id);
     }
 
     @GetMapping("/caminho/{pathId}")
-    public Page<PointOfInterestResponse> getByPath(@PathVariable String pathId, Pageable pageable) {
-        return pointOfInterestService.getByPath(pathId, pageable);
+    public Page<PointOfInterestResponse> getByPath(AuthenticatedUser user,
+                                                   @PathVariable String pathId, Pageable pageable) {
+        return pointOfInterestService.getByPath(user.id(), pathId, pageable);
     }
 
     @PostMapping("/evidencia")

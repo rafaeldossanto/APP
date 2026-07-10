@@ -29,6 +29,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,6 +44,8 @@ class PointOfInterestServiceTest {
     private EvidenceRepository evidenceRepository;
     @Mock
     private PathRepository pathRepository;
+    @Mock
+    private AdventureAccessService accessService;
 
     @InjectMocks
     private PointOfInterestService service;
@@ -59,7 +62,25 @@ class PointOfInterestServiceTest {
 
         assertThat(response.name()).isEqualTo(request.name());
         assertThat(response.type()).isEqualTo(request.type());
+        // Recem-criado com descricao e sem evidencias: nivel 2 (nao o 1 fixo de antes).
+        assertThat(response.confidenceLevel()).isEqualTo(2);
         verify(pointRepository).save(any(PointOfInterest.class));
+    }
+
+    @Test
+    @DisplayName("create should fail when user is not owner nor participant of the adventure")
+    void shouldFailCreateWithoutBond() {
+        PointOfInterestRequest request = PointOfInterestStub.aRequest();
+        Path path = PathStub.aPath().build();
+        when(pathRepository.findById(request.pathId())).thenReturn(Optional.of(path));
+        doThrow(new IllegalArgumentException("Voce nao participa desta aventura"))
+                .when(accessService).validateContribute("intruso", path.getAdventure());
+
+        assertThatThrownBy(() -> service.create("intruso", request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("nao participa");
+
+        verify(pointRepository, never()).save(any());
     }
 
     @Test
@@ -116,13 +137,29 @@ class PointOfInterestServiceTest {
     }
 
     @Test
+    @DisplayName("addEvidence should fail when user cannot view the point's adventure")
+    void shouldFailEvidenceWithoutAccess() {
+        PointOfInterest point = PointOfInterestStub.aPoint().build();
+        EvidenceRequest request = PointOfInterestStub.aCloseEvidenceRequest();
+        when(pointRepository.findById(request.pointId())).thenReturn(Optional.of(point));
+        doThrow(new IllegalArgumentException("Aventura nao encontrada ou sem acesso"))
+                .when(accessService).validateView("intruso", point.getPath().getAdventure());
+
+        assertThatThrownBy(() -> service.addEvidence("intruso", request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("sem acesso");
+
+        verify(evidenceRepository, never()).save(any());
+    }
+
+    @Test
     @DisplayName("getById should calculate maximum level (3+ users and description)")
     void shouldCalculateMaximumLevel() {
         PointOfInterest point = PointOfInterestStub.aPoint().build();
         when(pointRepository.findById(point.getId())).thenReturn(Optional.of(point));
         when(evidenceRepository.countValidatedUsersByPointId(point.getId())).thenReturn(3L);
 
-        PointOfInterestResponse response = service.getById(point.getId());
+        PointOfInterestResponse response = service.getById(PointOfInterestStub.USER_ID, point.getId());
 
         assertThat(response.confidenceLevel()).isEqualTo(5);
     }
@@ -134,9 +171,22 @@ class PointOfInterestServiceTest {
         when(pointRepository.findById(point.getId())).thenReturn(Optional.of(point));
         when(evidenceRepository.countValidatedUsersByPointId(point.getId())).thenReturn(0L);
 
-        PointOfInterestResponse response = service.getById(point.getId());
+        PointOfInterestResponse response = service.getById(PointOfInterestStub.USER_ID, point.getId());
 
         assertThat(response.confidenceLevel()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("getById should fail when observer cannot view the point's adventure")
+    void shouldFailGetByIdWithoutAccess() {
+        PointOfInterest point = PointOfInterestStub.aPoint().build();
+        when(pointRepository.findById(point.getId())).thenReturn(Optional.of(point));
+        doThrow(new IllegalArgumentException("Aventura nao encontrada ou sem acesso"))
+                .when(accessService).validateView("intruso", point.getPath().getAdventure());
+
+        assertThatThrownBy(() -> service.getById("intruso", point.getId()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("sem acesso");
     }
 
     @Test
@@ -144,15 +194,29 @@ class PointOfInterestServiceTest {
     void shouldListByPath() {
         Pageable pageable = PageRequest.of(0, 10);
         PointOfInterest point = PointOfInterestStub.aPoint().build();
+        when(accessService.canViewPath(PointOfInterestStub.USER_ID, PathStub.ID)).thenReturn(true);
         when(pointRepository.findByPathId(PathStub.ID, pageable))
                 .thenReturn(new PageImpl<>(List.of(point)));
         // batch count: [pointId, total] — 1 validated user for the point
         when(evidenceRepository.countValidatedUsersPerPoint(List.of(point.getId())))
                 .thenReturn(List.<Object[]>of(new Object[]{point.getId(), 1L}));
 
-        Page<PointOfInterestResponse> response = service.getByPath(PathStub.ID, pageable);
+        Page<PointOfInterestResponse> response =
+                service.getByPath(PointOfInterestStub.USER_ID, PathStub.ID, pageable);
 
         assertThat(response.getContent()).hasSize(1);
         assertThat(response.getContent().get(0).confidenceLevel()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("getByPath should fail without exposing points when observer lacks access")
+    void shouldFailListByPathWithoutAccess() {
+        when(accessService.canViewPath("intruso", PathStub.ID)).thenReturn(false);
+
+        assertThatThrownBy(() -> service.getByPath("intruso", PathStub.ID, PageRequest.of(0, 10)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("sem acesso");
+
+        verify(pointRepository, never()).findByPathId(any(), any());
     }
 }
