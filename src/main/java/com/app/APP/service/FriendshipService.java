@@ -2,6 +2,7 @@ package com.app.APP.service;
 
 import com.app.APP.entity.Friendship;
 import com.app.APP.entity.User;
+import com.app.APP.exception.ForbiddenException;
 import com.app.APP.mapper.FriendshipMapper;
 import com.app.APP.model.dto.request.FriendshipRequest;
 import com.app.APP.model.dto.response.FriendshipResponse;
@@ -54,7 +55,7 @@ public class FriendshipService {
         Friendship friendship = findById(friendshipId);
 
         if (!userId.equals(friendship.getReceiverId())) {
-            throw new IllegalArgumentException("Apenas o destinatario pode responder a solicitacao");
+            throw new ForbiddenException("Apenas o destinatario pode responder a solicitacao");
         }
         if (!FriendshipStatus.PENDENTE.equals(friendship.getStatus())) {
             throw new IllegalArgumentException("Essa solicitacao ja foi respondida");
@@ -72,7 +73,7 @@ public class FriendshipService {
         Friendship friendship = findById(friendshipId);
 
         if (!userId.equals(friendship.getRequesterId())) {
-            throw new IllegalArgumentException("Apenas quem enviou pode cancelar a solicitacao");
+            throw new ForbiddenException("Apenas quem enviou pode cancelar a solicitacao");
         }
         if (!FriendshipStatus.PENDENTE.equals(friendship.getStatus())) {
             throw new IllegalArgumentException("So e possivel cancelar uma solicitacao pendente");
@@ -127,7 +128,7 @@ public class FriendshipService {
             throw new IllegalArgumentException("Essa relacao nao esta bloqueada");
         }
         if (!userId.equals(friendship.getBlockedBy())) {
-            throw new IllegalArgumentException("Apenas quem bloqueou pode desbloquear");
+            throw new ForbiddenException("Apenas quem bloqueou pode desbloquear");
         }
 
         friendshipRepository.delete(friendship);
@@ -187,7 +188,7 @@ public class FriendshipService {
     private void validateParticipant(Friendship friendship, String userId) {
         boolean participates = userId.equals(friendship.getRequesterId()) || userId.equals(friendship.getReceiverId());
         if (!participates) {
-            throw new IllegalArgumentException("Voce nao participa dessa relacao");
+            throw new ForbiddenException("Voce nao participa dessa relacao");
         }
     }
 }

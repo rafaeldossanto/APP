@@ -124,7 +124,7 @@ class FriendshipServiceTest {
         when(friendshipRepository.findById(FriendshipStub.ID)).thenReturn(Optional.of(friendship));
 
         assertThatThrownBy(() -> service.respond(FriendshipStub.REQUESTER_ID, FriendshipStub.ID, FriendshipStatus.ACEITA))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.app.APP.exception.ForbiddenException.class)
                 .hasMessageContaining("destinatario");
 
         verify(friendshipRepository, never()).save(any());
@@ -179,7 +179,7 @@ class FriendshipServiceTest {
         when(friendshipRepository.findById(FriendshipStub.ID)).thenReturn(Optional.of(friendship));
 
         assertThatThrownBy(() -> service.cancelRequest(FriendshipStub.RECEIVER_ID, FriendshipStub.ID))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.app.APP.exception.ForbiddenException.class)
                 .hasMessageContaining("quem enviou");
 
         verify(friendshipRepository, never()).delete(any());
@@ -203,7 +203,7 @@ class FriendshipServiceTest {
         when(friendshipRepository.findById(FriendshipStub.ID)).thenReturn(Optional.of(friendship));
 
         assertThatThrownBy(() -> service.unfriend("stranger", FriendshipStub.ID))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.app.APP.exception.ForbiddenException.class)
                 .hasMessageContaining("nao participa");
 
         verify(friendshipRepository, never()).delete(any());
@@ -273,7 +273,7 @@ class FriendshipServiceTest {
         when(friendshipRepository.findById(FriendshipStub.ID)).thenReturn(Optional.of(friendship));
 
         assertThatThrownBy(() -> service.unblock(FriendshipStub.RECEIVER_ID, FriendshipStub.ID))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.app.APP.exception.ForbiddenException.class)
                 .hasMessageContaining("quem bloqueou");
 
         verify(friendshipRepository, never()).delete(any());

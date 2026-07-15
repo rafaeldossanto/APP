@@ -1,6 +1,7 @@
 package com.app.APP.controller;
 
 import com.app.APP.auth.AuthenticatedUser;
+import com.app.APP.exception.ForbiddenException;
 import com.app.APP.model.dto.request.FriendshipRequest;
 import com.app.APP.model.dto.response.FriendshipResponse;
 import com.app.APP.model.enums.FriendshipStatus;
@@ -76,7 +77,10 @@ public class FriendshipController {
 
     /** Friendship check between two users — used by the Location service (AMIGOS visibility). */
     @GetMapping("/sao-amigos")
-    public boolean areFriends(@RequestParam String a, @RequestParam String b) {
+    public boolean areFriends(AuthenticatedUser user, @RequestParam String a, @RequestParam String b) {
+        if (!user.id().equals(a) && !user.id().equals(b)) {
+            throw new ForbiddenException("Consulta permitida apenas sobre a propria relacao");
+        }
         return friendshipService.areFriends(a, b);
     }
 

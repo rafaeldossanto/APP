@@ -89,14 +89,14 @@ class MediaControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /midia/{id} retorna 400 quando nao e o dono")
+    @DisplayName("DELETE /midia/{id} retorna 403 quando nao e o dono")
     void shouldRejectDeleteByNonOwner() throws Exception {
-        doThrow(new IllegalArgumentException("Voce nao e o dono desta midia"))
+        doThrow(new com.app.APP.exception.ForbiddenException("Voce nao e o dono desta midia"))
                 .when(mediaService).delete(any(), eq(MEDIA_ID));
 
         mockMvc.perform(delete("/midia/{id}", MEDIA_ID)
                         .with(jwt().jwt(j -> j.subject("outro-usuario").claim("codigoUsuario", "code-outro"))))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test

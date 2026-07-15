@@ -1,6 +1,7 @@
 package com.app.APP.controller;
 
 import com.app.APP.auth.AuthenticatedUser;
+import com.app.APP.exception.ForbiddenException;
 import com.app.APP.model.dto.request.FollowRequest;
 import com.app.APP.model.dto.response.CountersResponse;
 import com.app.APP.model.dto.response.FollowStatusResponse;
@@ -63,8 +64,12 @@ public class FollowerController {
 
     /** Follow check by ids — used by the Location service (SEGUIDORES visibility). */
     @GetMapping("/segue")
-    public boolean isFollower(@RequestParam("seguidorId") String followerId,
+    public boolean isFollower(AuthenticatedUser user,
+                              @RequestParam("seguidorId") String followerId,
                               @RequestParam("seguidoId") String followedId) {
+        if (!user.id().equals(followerId) && !user.id().equals(followedId)) {
+            throw new ForbiddenException("Consulta permitida apenas sobre a propria relacao");
+        }
         return followerService.isFollower(followerId, followedId);
     }
 

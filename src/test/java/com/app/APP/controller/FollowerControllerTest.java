@@ -131,6 +131,16 @@ class FollowerControllerTest {
     }
 
     @Test
+    @DisplayName("GET /seguidor/segue recusa consulta sobre relacao alheia")
+    void shouldRejectFollowerCheckForUnrelatedUsers() throws Exception {
+        mockMvc.perform(get("/seguidor/segue")
+                        .with(jwt().jwt(j -> j.subject(USER_ID).claim("codigoUsuario", "code-1")))
+                        .param("seguidorId", "outro-1")
+                        .param("seguidoId", "outro-2"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     @DisplayName("GET /seguidor/seguindo-ids lista ids de quem o autenticado segue")
     void shouldListFollowingIds() throws Exception {
         when(followerService.followingIds(USER_ID)).thenReturn(List.of("usuario-2", "usuario-3"));

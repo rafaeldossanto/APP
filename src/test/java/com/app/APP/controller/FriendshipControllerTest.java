@@ -129,6 +129,16 @@ class FriendshipControllerTest {
     }
 
     @Test
+    @DisplayName("GET /amizade/sao-amigos recusa consulta sobre relacao alheia")
+    void shouldRejectAreFriendsForUnrelatedUsers() throws Exception {
+        mockMvc.perform(get("/amizade/sao-amigos")
+                        .with(jwt().jwt(j -> j.subject(USER_ID).claim("codigoUsuario", "code-1")))
+                        .param("a", "outro-1")
+                        .param("b", "outro-2"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     @DisplayName("GET /amizade/amigos-ids lista ids dos amigos do autenticado")
     void shouldListFriendIds() throws Exception {
         when(friendshipService.friendIds(USER_ID)).thenReturn(List.of("usuario-2", "usuario-3"));

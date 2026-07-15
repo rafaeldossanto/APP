@@ -146,14 +146,14 @@ class AdventureControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /aventura/{id} retorna 400 quando nao e o dono")
+    @DisplayName("DELETE /aventura/{id} retorna 403 quando nao e o dono")
     void shouldRejectDeleteByNonOwner() throws Exception {
-        doThrow(new IllegalArgumentException("Voce nao e o dono desta aventura"))
+        doThrow(new com.app.APP.exception.ForbiddenException("Voce nao e o dono desta aventura"))
                 .when(adventureService).delete(any(), eq(ADVENTURE_ID));
 
         mockMvc.perform(delete("/aventura/{id}", ADVENTURE_ID)
                         .with(jwt().jwt(j -> j.subject("outro-usuario").claim("codigoUsuario", "code-outro"))))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test

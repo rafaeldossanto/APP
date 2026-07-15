@@ -153,7 +153,7 @@ class AdventureServiceTest {
         // Sem o gate de dono, qualquer um se adicionaria a uma aventura SO_GRUPO
         // e ganharia acesso de leitura a ela.
         assertThatThrownBy(() -> service.addParticipant("intruso", AdventureStub.ID, "intruso"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.app.APP.exception.ForbiddenException.class)
                 .hasMessageContaining("nao e o dono");
 
         verify(participantRepository, never()).save(any());

@@ -116,7 +116,7 @@ class PathServiceTest {
         when(pathRepository.findById(PathStub.ID)).thenReturn(Optional.of(path));
 
         assertThatThrownBy(() -> service.finish("intruso", PathStub.ID, 12.5))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.app.APP.exception.ForbiddenException.class)
                 .hasMessageContaining("nao e o dono deste caminho");
 
         verify(pathRepository, never()).save(any());

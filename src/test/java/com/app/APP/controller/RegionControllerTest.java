@@ -129,14 +129,14 @@ class RegionControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /regiao/{id} retorna 400 quando nao e o dono")
+    @DisplayName("DELETE /regiao/{id} retorna 403 quando nao e o dono")
     void shouldRejectDeleteByNonOwner() throws Exception {
-        doThrow(new IllegalArgumentException("Voce nao e o dono desta regiao"))
+        doThrow(new com.app.APP.exception.ForbiddenException("Voce nao e o dono desta regiao"))
                 .when(regionService).delete(any(), eq(REGION_ID));
 
         mockMvc.perform(delete("/regiao/{id}", REGION_ID)
                         .with(jwt().jwt(j -> j.subject("outro-usuario").claim("codigoUsuario", "code-outro"))))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isForbidden());
     }
 
     @Test

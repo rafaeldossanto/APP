@@ -147,7 +147,7 @@ class RegionServiceTest {
         when(regionRepository.findById(REGION_ID)).thenReturn(Optional.of(region(RegionVisibility.PUBLICA)));
 
         assertThatThrownBy(() -> service.update(OBSERVER, REGION_ID, aRequest()))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(com.app.APP.exception.ForbiddenException.class)
                 .hasMessageContaining("nao e o dono");
 
         verify(regionRepository, never()).save(any());
