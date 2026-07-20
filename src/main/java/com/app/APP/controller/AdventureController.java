@@ -28,24 +28,28 @@ public class AdventureController {
     private final AdventureService adventureService;
 
     @PostMapping
-    public AdventureResponse create(AuthenticatedUser user, @RequestBody @Valid AdventureRequest request) {
+    public AdventureResponse create(AuthenticatedUser user,
+                                    @RequestBody @Valid AdventureRequest request) {
         return adventureService.create(user.id(), request);
     }
 
     @GetMapping("/{id}")
-    public AdventureResponse getById(AuthenticatedUser user, @PathVariable String id) {
+    public AdventureResponse getById(AuthenticatedUser user,
+                                     @PathVariable String id) {
         return adventureService.getById(user.id(), id);
     }
 
     @GetMapping("/usuario/{userId}")
     public Page<AdventureResponse> getByUser(AuthenticatedUser user,
-                                             @PathVariable String userId, Pageable pageable) {
+                                             @PathVariable String userId,
+                                             Pageable pageable) {
         return adventureService.getByUser(user.id(), userId, pageable);
     }
 
     /** Feed: minhas aventuras + as visiveis de quem eu sigo, mais recentes primeiro. */
     @GetMapping("/feed")
-    public Page<AdventureResponse> getFeed(AuthenticatedUser user, Pageable pageable) {
+    public Page<AdventureResponse> getFeed(AuthenticatedUser user,
+                                           Pageable pageable) {
         return adventureService.getFeed(user.id(), pageable);
     }
 
@@ -57,19 +61,22 @@ public class AdventureController {
     }
 
     @PatchMapping("/{id}/regiao")
-    public AdventureResponse moveRegion(AuthenticatedUser user, @PathVariable String id,
+    public AdventureResponse moveRegion(AuthenticatedUser user,
+                                        @PathVariable String id,
                                         @RequestBody MoveRegionRequest request) {
         return adventureService.moveRegion(user.id(), id, request.regionId());
     }
 
     @PostMapping("/{id}/participante")
-    public void addParticipant(AuthenticatedUser user, @PathVariable String id,
+    public void addParticipant(AuthenticatedUser user,
+                               @PathVariable String id,
                                @RequestParam String userId) {
         adventureService.addParticipant(user.id(), id, userId);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(AuthenticatedUser user, @PathVariable String id) {
+    public void delete(AuthenticatedUser user,
+                       @PathVariable String id) {
         adventureService.delete(user.id(), id);
     }
 }

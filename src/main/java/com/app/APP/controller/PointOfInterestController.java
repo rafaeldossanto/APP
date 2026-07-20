@@ -25,23 +25,27 @@ public class PointOfInterestController {
     private final PointOfInterestService pointOfInterestService;
 
     @PostMapping
-    public PointOfInterestResponse create(AuthenticatedUser user, @RequestBody @Valid PointOfInterestRequest request) {
+    public PointOfInterestResponse create(AuthenticatedUser user,
+                                          @RequestBody @Valid PointOfInterestRequest request) {
         return pointOfInterestService.create(user.id(), request);
     }
 
     @GetMapping("/{id}")
-    public PointOfInterestResponse getById(AuthenticatedUser user, @PathVariable String id) {
+    public PointOfInterestResponse getById(AuthenticatedUser user,
+                                           @PathVariable String id) {
         return pointOfInterestService.getById(user.id(), id);
     }
 
     @GetMapping("/caminho/{pathId}")
     public Page<PointOfInterestResponse> getByPath(AuthenticatedUser user,
-                                                   @PathVariable String pathId, Pageable pageable) {
+                                                   @PathVariable String pathId,
+                                                   Pageable pageable) {
         return pointOfInterestService.getByPath(user.id(), pathId, pageable);
     }
 
     @PostMapping("/evidencia")
-    public EvidenceResponse addEvidence(AuthenticatedUser user, @RequestBody @Valid EvidenceRequest request) {
+    public EvidenceResponse addEvidence(AuthenticatedUser user,
+                                        @RequestBody @Valid EvidenceRequest request) {
         return pointOfInterestService.addEvidence(user.id(), request);
     }
 }

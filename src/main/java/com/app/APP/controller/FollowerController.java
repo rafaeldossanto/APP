@@ -33,22 +33,26 @@ public class FollowerController {
     private final FollowerService followerService;
 
     @PostMapping
-    public void follow(AuthenticatedUser user, @RequestBody @Valid FollowRequest request) {
+    public void follow(AuthenticatedUser user,
+                       @RequestBody @Valid FollowRequest request) {
         followerService.follow(user.id(), request.followedCode());
     }
 
     @DeleteMapping
-    public void unfollow(AuthenticatedUser user, @RequestBody @Valid FollowRequest request) {
+    public void unfollow(AuthenticatedUser user,
+                         @RequestBody @Valid FollowRequest request) {
         followerService.unfollow(user.id(), request.followedCode());
     }
 
     @GetMapping("/seguidores")
-    public Page<PublicUserResponse> getFollowers(@RequestParam String codigo, Pageable pageable) {
+    public Page<PublicUserResponse> getFollowers(@RequestParam String codigo,
+                                                 Pageable pageable) {
         return followerService.getFollowers(codigo, pageable);
     }
 
     @GetMapping("/seguindo")
-    public Page<PublicUserResponse> getFollowing(@RequestParam String codigo, Pageable pageable) {
+    public Page<PublicUserResponse> getFollowing(@RequestParam String codigo,
+                                                 Pageable pageable) {
         return followerService.getFollowing(codigo, pageable);
     }
 
@@ -58,7 +62,8 @@ public class FollowerController {
     }
 
     @GetMapping("/status")
-    public FollowStatusResponse status(AuthenticatedUser user, @RequestParam String codigo) {
+    public FollowStatusResponse status(AuthenticatedUser user,
+                                       @RequestParam String codigo) {
         return followerService.status(user.id(), codigo);
     }
 

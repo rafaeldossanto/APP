@@ -24,19 +24,22 @@ public class MediaController {
     private final MediaService mediaService;
 
     @PostMapping
-    public MediaResponse save(AuthenticatedUser user, @RequestBody @Valid MediaRequest request) {
+    public MediaResponse save(AuthenticatedUser user,
+                              @RequestBody @Valid MediaRequest request) {
         return mediaService.save(user.id(), request);
     }
 
     @GetMapping("/aventura/{adventureId}")
     public Page<MediaResponse> getByAdventure(AuthenticatedUser user,
-                                              @PathVariable String adventureId, Pageable pageable) {
+                                              @PathVariable String adventureId,
+                                              Pageable pageable) {
         return mediaService.getByAdventure(user.id(), adventureId, pageable);
     }
 
     @GetMapping("/caminho/{pathId}")
     public Page<MediaResponse> getByPath(AuthenticatedUser user,
-                                         @PathVariable String pathId, Pageable pageable) {
+                                         @PathVariable String pathId,
+                                         Pageable pageable) {
         return mediaService.getByPath(user.id(), pathId, pageable);
     }
 

@@ -26,38 +26,46 @@ public class RegionController {
     private final RegionService regionService;
 
     @PostMapping
-    public RegionResponse create(AuthenticatedUser user, @RequestBody @Valid RegionRequest request) {
+    public RegionResponse create(AuthenticatedUser user,
+                                 @RequestBody @Valid RegionRequest request) {
         return regionService.create(user.id(), request);
     }
 
     @GetMapping
-    public Page<RegionResponse> listMine(AuthenticatedUser user, Pageable pageable) {
+    public Page<RegionResponse> listMine(AuthenticatedUser user,
+                                         Pageable pageable) {
         return regionService.listMine(user.id(), pageable);
     }
 
     @GetMapping("/descobrir")
-    public Page<RegionResponse> discover(AuthenticatedUser user, Pageable pageable) {
+    public Page<RegionResponse> discover(AuthenticatedUser user,
+                                         Pageable pageable) {
         return regionService.discover(user.id(), pageable);
     }
 
     @GetMapping("/{id}")
-    public RegionResponse getById(AuthenticatedUser user, @PathVariable String id) {
+    public RegionResponse getById(AuthenticatedUser user,
+                                  @PathVariable String id) {
         return regionService.getById(user.id(), id);
     }
 
     @GetMapping("/{id}/aventuras")
-    public Page<AdventureResponse> getAdventures(AuthenticatedUser user, @PathVariable String id, Pageable pageable) {
+    public Page<AdventureResponse> getAdventures(AuthenticatedUser user,
+                                                 @PathVariable String id,
+                                                 Pageable pageable) {
         return regionService.getAdventures(user.id(), id, pageable);
     }
 
     @PutMapping("/{id}")
-    public RegionResponse update(AuthenticatedUser user, @PathVariable String id,
+    public RegionResponse update(AuthenticatedUser user,
+                                 @PathVariable String id,
                                  @RequestBody @Valid RegionRequest request) {
         return regionService.update(user.id(), id, request);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(AuthenticatedUser user, @PathVariable String id) {
+    public void delete(AuthenticatedUser user,
+                       @PathVariable String id) {
         regionService.delete(user.id(), id);
     }
 }

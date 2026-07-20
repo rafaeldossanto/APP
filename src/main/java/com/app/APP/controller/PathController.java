@@ -28,37 +28,42 @@ public class PathController {
     private final PathService pathService;
 
     @PostMapping
-    public PathResponse start(AuthenticatedUser user, @RequestBody @Valid PathRequest request) {
+    public PathResponse start(AuthenticatedUser user,
+                              @RequestBody @Valid PathRequest request) {
         return pathService.start(user.id(), request);
     }
 
     @PatchMapping("/{id}/finalizar")
-    public PathResponse finish(AuthenticatedUser user, @PathVariable String id,
+    public PathResponse finish(AuthenticatedUser user,
+                               @PathVariable String id,
                                @RequestParam Double totalDistanceKm) {
         return pathService.finish(user.id(), id, totalDistanceKm);
     }
 
     @GetMapping("/aventura/{adventureId}")
     public Page<PathResponse> getByAdventure(AuthenticatedUser user,
-                                             @PathVariable String adventureId, Pageable pageable) {
+                                             @PathVariable String adventureId,
+                                             Pageable pageable) {
         return pathService.getByAdventure(user.id(), adventureId, pageable);
     }
 
     @GetMapping("/usuario/{userId}")
     public Page<PathResponse> getByUser(AuthenticatedUser user,
-                                        @PathVariable String userId, Pageable pageable) {
+                                        @PathVariable String userId,
+                                        Pageable pageable) {
         return pathService.getByUser(user.id(), userId, pageable);
     }
 
-    /** O usuario autenticado pode ver este caminho? Usado pelo BFF para os pontos GPS. */
     @GetMapping("/{id}/acesso")
-    public boolean canView(AuthenticatedUser user, @PathVariable String id) {
+    public boolean canView(AuthenticatedUser user,
+                           @PathVariable String id) {
         return pathService.canView(user.id(), id);
     }
 
     /** Quais destes caminhos o usuario autenticado pode ver no mapa colaborativo. */
     @GetMapping("/descobrir")
-    public List<PathDiscoveryResponse> discover(AuthenticatedUser user, @RequestParam("ids") List<String> ids) {
+    public List<PathDiscoveryResponse> discover(AuthenticatedUser user,
+                                                @RequestParam("ids") List<String> ids) {
         return pathService.discover(user.id(), ids);
     }
 }
