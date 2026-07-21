@@ -36,7 +36,6 @@ public class UserSearchService {
                 .toList();
     }
 
-    /** Resumo (com id) a partir do codigo publico — perfil de terceiro no app. */
     @Transactional(readOnly = true)
     public UserSummaryResponse findSummaryByCode(String userCode) {
         User user = userRepository.findByUserCode(userCode)
@@ -48,7 +47,6 @@ public class UserSearchService {
                 .build();
     }
 
-    /** Resolucao em lote de ids -> nome/codigo (BFF enriquece mapa, ao vivo e feed). */
     @Transactional(readOnly = true)
     public List<UserSummaryResponse> getSummaries(List<String> ids) {
         return userRepository.findAllById(ids).stream()

@@ -78,7 +78,6 @@ public class FollowerService {
                 followerRepository.countByFollowerId(userId));
     }
 
-    /** Follow relation between the token user (me) and the user identified by code. */
     @Transactional(readOnly = true)
     public FollowStatusResponse status(String myId, String otherCode) {
         String otherId = resolveId(otherCode);
@@ -87,13 +86,11 @@ public class FollowerService {
         return new FollowStatusResponse(following, followsMe, following && followsMe);
     }
 
-    /** Follow check by ids — used by the Location service (SEGUIDORES visibility). */
     @Transactional(readOnly = true)
     public boolean isFollower(String followerId, String followedId) {
         return followerRepository.existsByFollowerIdAndFollowedId(followerId, followedId);
     }
 
-    /** Ids de quem o usuario segue — checagem em lote do loc (lista ao vivo). */
     @Transactional(readOnly = true)
     public List<String> followingIds(String userId) {
         return followerRepository.findFollowedIds(userId);

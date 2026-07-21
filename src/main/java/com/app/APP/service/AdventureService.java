@@ -23,6 +23,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.app.APP.mapper.AdventureMapper.toResponse;
+import static java.util.Objects.isNull;
+
+
+// todo - colocar anotacao @lastUpdateDate nas entidade para que nao tenha que ficar setando em todo metodo isso quando fizer alguma modificacao e tortar automatico
 
 @Service
 @RequiredArgsConstructor
@@ -49,7 +53,6 @@ public class AdventureService {
         return toResponse(adventure);
     }
 
-    /** Moves the adventure to a region (folder) or removes it (null regionId). */
     @Transactional
     public AdventureResponse moveRegion(String userId, String adventureId, String regionId) {
         Adventure adventure = findOwner(userId, adventureId);
@@ -59,9 +62,8 @@ public class AdventureService {
         return toResponse(adventureRepository.save(adventure));
     }
 
-    /** Optional region: null when not provided; if provided, must belong to the user. */
     private Region resolveRegion(String userId, String regionId) {
-        if (regionId == null || regionId.isBlank()) {
+        if (isNull(regionId) || regionId.isBlank()) {
             return null;
         }
         Region region = regionRepository.findById(regionId)
@@ -77,7 +79,6 @@ public class AdventureService {
         return toResponse(adventure);
     }
 
-    /** Own list comes whole; someone else's is filtered by each adventure's visibility. */
     @Transactional(readOnly = true)
     public Page<AdventureResponse> getByUser(String observerId, String userId, Pageable pageable) {
         Page<Adventure> page = observerId.equals(userId)
@@ -107,7 +108,6 @@ public class AdventureService {
         return toResponse(adventureRepository.save(adventure));
     }
 
-    /** Only the owner can invite participants — participation grants read access. */
     public void addParticipant(String ownerId, String adventureId, String userId) {
         Adventure adventure = findOwner(ownerId, adventureId);
 

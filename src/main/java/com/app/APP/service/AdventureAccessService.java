@@ -32,7 +32,6 @@ public class AdventureAccessService {
         };
     }
 
-    /** A mensagem nao distingue "nao existe" de "sem acesso" — nao vaza existencia. */
     public void validateView(String observerId, Adventure adventure) {
         if (!canView(observerId, adventure)) {
             throw new IllegalArgumentException("Aventura nao encontrada ou sem acesso");
@@ -47,7 +46,6 @@ public class AdventureAccessService {
                 .orElse(false);
     }
 
-    /** Escrita de conteudo (caminho, ponto, midia): dono ou participante da aventura. */
     public boolean canContribute(String userId, Adventure adventure) {
         return adventure.getUserId().equals(userId)
                 || participantRepository.existsByAdventureIdAndUserId(adventure.getId(), userId);

@@ -54,7 +54,6 @@ public class RegionService {
         return RegionMapper.toResponse(regionRepository.save(region));
     }
 
-    /** Deletes the folder; adventures are not deleted — only unlinked. */
     @Transactional
     public void delete(String userId, String id) {
         Region region = findOwner(id, userId);
@@ -63,7 +62,6 @@ public class RegionService {
         log.info("Region {} deleted; adventures unlinked", id);
     }
 
-    /** Folders visible to the user that are not theirs (PUBLICA from everyone + AMIGOS from friends). */
     @Transactional(readOnly = true)
     public Page<RegionResponse> discover(String userId, Pageable pageable) {
         List<String> friends = friendshipRepository.findFriendIds(userId, FriendshipStatus.ACEITA);
@@ -71,7 +69,6 @@ public class RegionService {
         return regionRepository.findDiscoverable(userId, filter, pageable).map(RegionMapper::toResponse);
     }
 
-    /** Adventures in a folder, already filtered by each adventure's visibility. */
     @Transactional(readOnly = true)
     public Page<AdventureResponse> getAdventures(String userId, String regionId, Pageable pageable) {
         Region region = find(regionId);
@@ -79,7 +76,6 @@ public class RegionService {
         return adventureRepository.findVisibleInRegion(regionId, userId, pageable).map(AdventureMapper::toResponse);
     }
 
-    /** Read access to the folder: owner always; PUBLICA everyone; AMIGOS only owner's friends; PRIVADA owner only. */
     private void validateAccess(Region region, String userId) {
         if (userId.equals(region.getUserId())) {
             return;

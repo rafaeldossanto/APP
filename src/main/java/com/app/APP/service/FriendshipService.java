@@ -68,7 +68,6 @@ public class FriendshipService {
         return toResponse(friendshipRepository.save(friendship));
     }
 
-    /** Requester withdraws a still-pending request. */
     public void cancelRequest(String userId, String friendshipId) {
         Friendship friendship = findById(friendshipId);
 
@@ -83,7 +82,6 @@ public class FriendshipService {
         log.info("Friendship request {} cancelled", friendshipId);
     }
 
-    /** Ends an accepted friendship (unfriend) — either side can do it. */
     public void unfriend(String userId, String friendshipId) {
         Friendship friendship = findById(friendshipId);
         validateParticipant(friendship, userId);
@@ -96,11 +94,6 @@ public class FriendshipService {
         log.info("Friendship {} ended", friendshipId);
     }
 
-    /**
-     * Blocks a user: reuses the existing relation (if any) or creates a new one,
-     * marking it as BLOQUEADA and recording who did the blocking. Existing follows
-     * on both sides are removed — a block severs the social link entirely.
-     */
     @Transactional
     public FriendshipResponse block(String blockerId, FriendshipRequest request) {
         log.info("User {} blocking {}", blockerId, request.receiverCode());
@@ -120,7 +113,6 @@ public class FriendshipService {
         return toResponse(friendshipRepository.save(friendship));
     }
 
-    /** Removes a block — only the one who blocked can. */
     public void unblock(String userId, String friendshipId) {
         Friendship friendship = findById(friendshipId);
 
@@ -135,14 +127,12 @@ public class FriendshipService {
         log.info("Block on relation {} removed", friendshipId);
     }
 
-    /** Pending requests that ARRIVED at the user (for them to respond). */
     @Transactional(readOnly = true)
     public Page<FriendshipResponse> getPending(String userId, Pageable pageable) {
         return friendshipRepository.findByReceiverIdAndStatus(userId, FriendshipStatus.PENDENTE, pageable)
                 .map(FriendshipMapper::toResponse);
     }
 
-    /** Pending requests the user SENT, awaiting response. */
     @Transactional(readOnly = true)
     public Page<FriendshipResponse> getSent(String userId, Pageable pageable) {
         return friendshipRepository.findByRequesterIdAndStatus(userId, FriendshipStatus.PENDENTE, pageable)
@@ -155,7 +145,6 @@ public class FriendshipService {
                 .map(FriendshipMapper::toResponse);
     }
 
-    /** Indicates whether the two users are friends (ACEITA relation) — used by location service. */
     @Transactional(readOnly = true)
     public boolean areFriends(String userA, String userB) {
         return friendshipRepository.findRelation(userA, userB)
@@ -163,7 +152,6 @@ public class FriendshipService {
                 .isPresent();
     }
 
-    /** Ids of the user's friends — batch check for the location service (live list). */
     @Transactional(readOnly = true)
     public List<String> friendIds(String userId) {
         return friendshipRepository.findFriendIds(userId, FriendshipStatus.ACEITA);

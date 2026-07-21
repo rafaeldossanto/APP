@@ -55,8 +55,6 @@ public class PointOfInterestService {
         PointOfInterest point = pointRepository.findById(request.pointId())
                 .orElseThrow(() -> new IllegalArgumentException("Ponto nao encontrado"));
 
-        // Quem nao pode ver o ponto tambem nao evidencia — sem o gate, o erro de
-        // distancia permitiria trilaterar a posicao de um ponto privado.
         accessService.validateView(userId, point.getPath().getAdventure());
 
         double distance = GeoUtils.distanciaMetros(
