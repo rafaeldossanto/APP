@@ -3,8 +3,10 @@ package com.app.APP.controller;
 import com.app.APP.auth.WebConfig;
 import com.app.APP.model.dto.request.AdventureRequest;
 import com.app.APP.model.dto.response.AdventureResponse;
+import com.app.APP.model.dto.response.LeaveAdventureResponse;
 import com.app.APP.model.enums.AdventureStatus;
 import com.app.APP.model.enums.AdventureVisibility;
+import com.app.APP.service.AdventureExitService;
 import com.app.APP.service.AdventureService;
 import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -55,6 +57,9 @@ class AdventureControllerTest {
 
     @MockitoBean
     private AdventureService adventureService;
+
+    @MockitoBean
+    private AdventureExitService adventureExitService;
 
     private AdventureResponse responseStub() {
         return AdventureResponse.builder()
@@ -162,5 +167,30 @@ class AdventureControllerTest {
         mockMvc.perform(delete("/aventura/{id}", ADVENTURE_ID)
                         .with(jwt().jwt(j -> j.subject(USER_ID).claim("codigoUsuario", "code-1"))))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("DELETE /aventura/{id}/participante sai da aventura e retorna a aventura pessoal criada")
+    void shouldLeaveAdventure() throws Exception {
+        when(adventureExitService.leave(eq(USER_ID), eq(ADVENTURE_ID), eq(true)))
+                .thenReturn(new LeaveAdventureResponse("aventura-pessoal", 1, 0));
+
+        mockMvc.perform(delete("/aventura/{id}/participante", ADVENTURE_ID)
+                        .with(jwt().jwt(j -> j.subject(USER_ID).claim("codigoUsuario", "code-1"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.aventuraPessoalId").value("aventura-pessoal"))
+                .andExpect(jsonPath("$.caminhosMovidos").value(1));
+    }
+
+    @Test
+    @DisplayName("DELETE /aventura/{id}/participante/{userId} remove participante (kick) pelo dono")
+    void shouldKickParticipant() throws Exception {
+        when(adventureExitService.kick(eq(USER_ID), eq(ADVENTURE_ID), eq("membro-2")))
+                .thenReturn(new LeaveAdventureResponse("aventura-pessoal", 2, 0));
+
+        mockMvc.perform(delete("/aventura/{id}/participante/{userId}", ADVENTURE_ID, "membro-2")
+                        .with(jwt().jwt(j -> j.subject(USER_ID).claim("codigoUsuario", "code-1"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.aventuraPessoalId").value("aventura-pessoal"));
     }
 }

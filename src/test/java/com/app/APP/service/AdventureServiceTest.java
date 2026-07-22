@@ -10,11 +10,11 @@ import com.app.APP.repository.AdventureRepository;
 import com.app.APP.repository.AdventureParticipantRepository;
 import com.app.APP.repository.RegionRepository;
 import com.app.APP.stub.AdventureStub;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
@@ -46,9 +46,20 @@ class AdventureServiceTest {
     private com.app.APP.repository.FollowerRepository followerRepository;
     @Mock
     private AdventureAccessService accessService;
+    @Mock
+    private AdventureExitService adventureExitService;
+    @Mock
+    private com.app.APP.repository.PathRepository pathRepository;
 
-    @InjectMocks
     private AdventureService service;
+
+    @BeforeEach
+    void setup() {
+        AdventureMetricsAssembler metricsAssembler =
+                new AdventureMetricsAssembler(participantRepository, pathRepository);
+        service = new AdventureService(adventureRepository, participantRepository, regionRepository,
+                followerRepository, accessService, adventureExitService, metricsAssembler);
+    }
 
     @Test
     @DisplayName("create should persist adventure and the creator participant")
@@ -126,7 +137,6 @@ class AdventureServiceTest {
         AdventureResponse response = service.updateStatus(AdventureStub.USER_ID, AdventureStub.ID, AdventureStatus.CONCLUIDA);
 
         assertThat(response.status()).isEqualTo(AdventureStatus.CONCLUIDA);
-        assertThat(adventure.getUpdatedAt()).isNotNull();
     }
 
     @Test
@@ -182,6 +192,6 @@ class AdventureServiceTest {
 
         service.delete(AdventureStub.USER_ID, AdventureStub.ID);
 
-        verify(adventureRepository).delete(adventure);
+        verify(adventureExitService).deleteWithContent(adventure);
     }
 }

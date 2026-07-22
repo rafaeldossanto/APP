@@ -1,7 +1,6 @@
 package com.app.APP.service;
 
 import com.app.APP.entity.Region;
-import com.app.APP.mapper.AdventureMapper;
 import com.app.APP.mapper.RegionMapper;
 import com.app.APP.model.dto.request.RegionRequest;
 import com.app.APP.model.dto.response.AdventureResponse;
@@ -28,6 +27,7 @@ public class RegionService {
     private final RegionRepository regionRepository;
     private final FriendshipRepository friendshipRepository;
     private final AdventureRepository adventureRepository;
+    private final AdventureMetricsAssembler adventureMetricsAssembler;
 
     @Transactional
     public RegionResponse create(String userId, RegionRequest request) {
@@ -73,7 +73,7 @@ public class RegionService {
     public Page<AdventureResponse> getAdventures(String userId, String regionId, Pageable pageable) {
         Region region = find(regionId);
         validateAccess(region, userId);
-        return adventureRepository.findVisibleInRegion(regionId, userId, pageable).map(AdventureMapper::toResponse);
+        return adventureMetricsAssembler.buildPage(adventureRepository.findVisibleInRegion(regionId, userId, pageable));
     }
 
     private void validateAccess(Region region, String userId) {

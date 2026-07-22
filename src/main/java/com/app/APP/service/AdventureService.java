@@ -19,14 +19,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.app.APP.mapper.AdventureMapper.toResponse;
 import static java.util.Objects.isNull;
-
-
-// todo - colocar anotacao @lastUpdateDate nas entidade para que nao tenha que ficar setando em todo metodo isso quando fizer alguma modificacao e tortar automatico
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +33,8 @@ public class AdventureService {
     private final RegionRepository regionRepository;
     private final FollowerRepository followerRepository;
     private final AdventureAccessService accessService;
+    private final AdventureExitService adventureExitService;
+    private final AdventureMetricsAssembler metricsAssembler;
 
     @Transactional
     public AdventureResponse create(String userId, AdventureRequest request) {
@@ -50,16 +47,15 @@ public class AdventureService {
         participantRepository.save(ParticipantMapper.toEntity(adventure, userId));
 
         log.info("Adventure created with id: {}", adventure.getId());
-        return toResponse(adventure);
+        return metricsAssembler.build(adventure);
     }
 
     @Transactional
     public AdventureResponse moveRegion(String userId, String adventureId, String regionId) {
         Adventure adventure = findOwner(userId, adventureId);
         adventure.setRegion(resolveRegion(userId, regionId));
-        adventure.setUpdatedAt(LocalDateTime.now());
         log.info("Adventure {} moved to region {}", adventureId, regionId);
-        return toResponse(adventureRepository.save(adventure));
+        return metricsAssembler.build(adventureRepository.save(adventure));
     }
 
     private Region resolveRegion(String userId, String regionId) {
@@ -76,7 +72,7 @@ public class AdventureService {
     public AdventureResponse getById(String observerId, String id) {
         Adventure adventure = findById(id);
         accessService.validateView(observerId, adventure);
-        return toResponse(adventure);
+        return metricsAssembler.build(adventure);
     }
 
     @Transactional(readOnly = true)
@@ -84,7 +80,7 @@ public class AdventureService {
         Page<Adventure> page = observerId.equals(userId)
                 ? adventureRepository.findByUserId(userId, pageable)
                 : adventureRepository.findVisibleByUser(userId, observerId, pageable);
-        return page.map(AdventureMapper::toResponse);
+        return metricsAssembler.buildPage(page);
     }
 
     /**
@@ -96,16 +92,14 @@ public class AdventureService {
     public Page<AdventureResponse> getFeed(String observerId, Pageable pageable) {
         List<String> authors = followerRepository.findFollowedIds(observerId);
         List<String> filter = authors.isEmpty() ? List.of("__sem_seguidos__") : authors;
-        return adventureRepository.findFeed(observerId, filter, pageable)
-                .map(AdventureMapper::toResponse);
+        return metricsAssembler.buildPage(adventureRepository.findFeed(observerId, filter, pageable));
     }
 
     public AdventureResponse updateStatus(String userId, String id, AdventureStatus status) {
         log.info("Updating status of adventure {} to {}", id, status);
         Adventure adventure = findOwner(userId, id);
         adventure.setStatus(status);
-        adventure.setUpdatedAt(LocalDateTime.now());
-        return toResponse(adventureRepository.save(adventure));
+        return metricsAssembler.build(adventureRepository.save(adventure));
     }
 
     public void addParticipant(String ownerId, String adventureId, String userId) {
@@ -119,10 +113,10 @@ public class AdventureService {
         log.info("User {} added to adventure {}", userId, adventureId);
     }
 
+    @Transactional
     public void delete(String userId, String id) {
         Adventure adventure = findOwner(userId, id);
-        adventureRepository.delete(adventure);
-        log.info("Adventure {} deleted", id);
+        adventureExitService.deleteWithContent(adventure);
     }
 
     private Adventure findById(String id) {

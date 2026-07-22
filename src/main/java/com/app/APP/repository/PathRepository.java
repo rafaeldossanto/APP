@@ -14,8 +14,15 @@ public interface PathRepository extends JpaRepository<Path, String> {
     Page<Path> findByAdventureId(String adventureId, Pageable pageable);
     Page<Path> findByUserId(String userId, Pageable pageable);
 
+    /** Caminhos de um usuario dentro de uma aventura — usado ao sair/remover da aventura. */
+    List<Path> findByAdventureIdAndUserId(String adventureId, String userId);
+
     /** How many paths the adventure already has — base for the next sequential number. */
     int countByAdventureId(String adventureId);
+
+    /** Janela de tempo por aventura (min inicio / max fim) — um id ou em lote, evita N+1. */
+    @Query("SELECT p.adventure.id, MIN(p.startedAt), MAX(p.finishedAt) FROM Path p WHERE p.adventure.id IN :ids GROUP BY p.adventure.id")
+    List<Object[]> findTimespansByAdventureIds(List<String> ids);
 
     /** Someone else's paths the observer may see (owner uses findByUserId). */
     @Query(value = """

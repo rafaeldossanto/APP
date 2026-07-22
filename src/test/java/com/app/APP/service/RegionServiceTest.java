@@ -47,6 +47,8 @@ class RegionServiceTest {
     private FriendshipRepository friendshipRepository;
     @Mock
     private AdventureRepository adventureRepository;
+    @Mock
+    private AdventureMetricsAssembler adventureMetricsAssembler;
 
     @InjectMocks
     private RegionService service;

@@ -97,6 +97,20 @@ class AdventureAccessServiceTest {
     }
 
     @Test
+    @DisplayName("canViewPath: the path's own owner always sees it, even in a PRIVADA adventure of someone else")
+    void canViewPathOwnerAlwaysSees() {
+        Path path = PathStub.aPath()
+                .userId(OBSERVER)
+                .adventure(adventure(AdventureVisibility.PRIVADA))
+                .build();
+        when(pathRepository.findById(PathStub.ID)).thenReturn(Optional.of(path));
+
+        // O dono do caminho mantem acesso mesmo apos sair para uma aventura pessoal PRIVADA.
+        assertThat(service.canViewPath(OBSERVER, PathStub.ID)).isTrue();
+        verifyNoInteractions(participantRepository);
+    }
+
+    @Test
     @DisplayName("canViewPath is false for unknown path (does not leak existence)")
     void canViewPathUnknown() {
         when(pathRepository.findById("inexistente")).thenReturn(Optional.empty());

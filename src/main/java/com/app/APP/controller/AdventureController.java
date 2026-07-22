@@ -4,7 +4,9 @@ import com.app.APP.auth.AuthenticatedUser;
 import com.app.APP.model.dto.request.AdventureRequest;
 import com.app.APP.model.dto.request.MoveRegionRequest;
 import com.app.APP.model.dto.response.AdventureResponse;
+import com.app.APP.model.dto.response.LeaveAdventureResponse;
 import com.app.APP.model.enums.AdventureStatus;
+import com.app.APP.service.AdventureExitService;
 import com.app.APP.service.AdventureService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdventureController {
 
     private final AdventureService adventureService;
+    private final AdventureExitService adventureExitService;
 
     @PostMapping
     public AdventureResponse create(AuthenticatedUser user,
@@ -72,6 +75,22 @@ public class AdventureController {
                                @PathVariable String id,
                                @RequestParam String userId) {
         adventureService.addParticipant(user.id(), id, userId);
+    }
+
+    /** O proprio usuario sai da aventura em grupo; manterDados preserva os registros. */
+    @DeleteMapping("/{id}/participante")
+    public LeaveAdventureResponse leave(AuthenticatedUser user,
+                                        @PathVariable String id,
+                                        @RequestParam(defaultValue = "true") boolean manterDados) {
+        return adventureExitService.leave(user.id(), id, manterDados);
+    }
+
+    /** O dono remove um participante; os dados do removido sao sempre preservados. */
+    @DeleteMapping("/{id}/participante/{userId}")
+    public LeaveAdventureResponse kick(AuthenticatedUser user,
+                                       @PathVariable String id,
+                                       @PathVariable String userId) {
+        return adventureExitService.kick(user.id(), id, userId);
     }
 
     @DeleteMapping("/{id}")

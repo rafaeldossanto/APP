@@ -41,8 +41,7 @@ public class AdventureAccessService {
     @Transactional(readOnly = true)
     public boolean canViewPath(String observerId, String pathId) {
         return pathRepository.findById(pathId)
-                .map(Path::getAdventure)
-                .map(adventure -> canView(observerId, adventure))
+                .map(path -> path.getUserId().equals(observerId) || canView(observerId, path.getAdventure()))
                 .orElse(false);
     }
 

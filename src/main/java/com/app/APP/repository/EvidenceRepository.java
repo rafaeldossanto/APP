@@ -23,4 +23,7 @@ public interface EvidenceRepository extends JpaRepository<Evidence, String> {
     List<Object[]> countValidatedUsersPerPoint(List<String> pointIds);
 
     boolean existsByPointIdAndUserId(String pointId, String userId);
+
+    /** Remove evidencias de um conjunto de pontos — cascata ao descartar dados. */
+    void deleteByPointIdIn(List<String> pointIds);
 }

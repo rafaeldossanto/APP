@@ -11,4 +11,7 @@ public interface PointOfInterestUserStatusRepository extends JpaRepository<Point
     Optional<PointOfInterestUserStatus> findByUserIdAndPointId(String userId, String pointId);
 
     List<PointOfInterestUserStatus> findByUserIdAndPointIdIn(String userId, List<String> pointIds);
+
+    /** Remove marcacoes pessoais de um conjunto de pontos — cascata ao descartar dados. */
+    void deleteByPointIdIn(List<String> pointIds);
 }
