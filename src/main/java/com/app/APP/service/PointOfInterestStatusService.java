@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.util.Objects.isNull;
@@ -33,7 +32,6 @@ public class PointOfInterestStatusService {
 
         PointOfInterestUserStatus mark = findOrNew(userId, pointId);
         mark.setStatus(status);
-        mark.setUpdatedAt(LocalDateTime.now());
 
         return PointOfInterestStatusMapper.toResponse(statusRepository.save(mark));
     }
@@ -57,7 +55,6 @@ public class PointOfInterestStatusService {
 
         PointOfInterestUserStatus mark = findOrNew(userId, pointId);
         mark.setGoal(true);
-        mark.setUpdatedAt(LocalDateTime.now());
 
         return PointOfInterestStatusMapper.toResponse(statusRepository.save(mark));
     }
@@ -100,7 +97,6 @@ public class PointOfInterestStatusService {
             statusRepository.delete(mark);
             return mark;
         }
-        mark.setUpdatedAt(LocalDateTime.now());
         return statusRepository.save(mark);
     }
 

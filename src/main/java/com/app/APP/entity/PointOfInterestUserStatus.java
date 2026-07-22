@@ -3,6 +3,7 @@ package com.app.APP.entity;
 import com.app.APP.model.enums.PointStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
@@ -14,6 +15,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -30,6 +34,7 @@ import java.time.LocalDateTime;
                 @Index(name = "idx_status_ponto_usuario", columnList = "usuario_id"),
                 @Index(name = "idx_status_ponto_ponto", columnList = "ponto_id")
         })
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -53,9 +58,11 @@ public class PointOfInterestUserStatus {
     @Column(name = "objetivo", nullable = false)
     private boolean goal;
 
-    @Column(name = "criado_em")
+    @CreatedDate
+    @Column(name = "criado_em", updatable = false)
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "atualizado_em")
     private LocalDateTime updatedAt;
 }

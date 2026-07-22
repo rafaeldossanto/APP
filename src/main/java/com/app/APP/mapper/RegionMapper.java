@@ -8,7 +8,6 @@ import com.app.APP.model.dto.response.RegionResponse;
 import com.app.APP.model.enums.RegionVisibility;
 import lombok.experimental.UtilityClass;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +19,6 @@ import static java.util.Objects.isNull;
 public class RegionMapper {
 
     public static Region toEntity(RegionRequest request, String userId) {
-        LocalDateTime now = LocalDateTime.now();
         return Region.builder()
                 .id(UUID.randomUUID().toString())
                 .userId(userId)
@@ -28,8 +26,6 @@ public class RegionMapper {
                 .description(request.description())
                 .visibility(visibilityOrDefault(request))
                 .cities(toCities(request.cities()))
-                .createdAt(now)
-                .updatedAt(now)
                 .build();
     }
 
@@ -39,7 +35,6 @@ public class RegionMapper {
         region.setDescription(request.description());
         region.setVisibility(visibilityOrDefault(request));
         region.setCities(toCities(request.cities()));
-        region.setUpdatedAt(LocalDateTime.now());
     }
 
     public static RegionResponse toResponse(Region region) {

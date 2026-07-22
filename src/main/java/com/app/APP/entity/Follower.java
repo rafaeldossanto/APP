@@ -2,6 +2,7 @@ package com.app.APP.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
@@ -11,6 +12,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -25,6 +28,7 @@ import java.time.LocalDateTime;
                 @Index(name = "idx_seguidor_seguidor", columnList = "seguidor_id"),
                 @Index(name = "idx_seguidor_seguido", columnList = "seguido_id")
         })
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -41,6 +45,7 @@ public class Follower {
     @Column(name = "seguido_id", nullable = false)
     private String followedId;
 
-    @Column(name = "criado_em")
+    @CreatedDate
+    @Column(name = "criado_em", updatable = false)
     private LocalDateTime createdAt;
 }

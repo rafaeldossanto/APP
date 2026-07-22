@@ -4,7 +4,6 @@ import com.app.APP.entity.PointOfInterestUserStatus;
 import com.app.APP.model.dto.response.PointStatusResponse;
 import lombok.experimental.UtilityClass;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @UtilityClass
@@ -15,7 +14,6 @@ public class PointOfInterestStatusMapper {
                 .id(UUID.randomUUID().toString())
                 .userId(userId)
                 .pointId(pointId)
-                .createdAt(LocalDateTime.now())
                 .build();
     }
 

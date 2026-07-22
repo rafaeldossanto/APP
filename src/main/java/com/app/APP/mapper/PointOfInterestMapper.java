@@ -9,7 +9,6 @@ import com.app.APP.model.dto.response.EvidenceResponse;
 import com.app.APP.model.dto.response.PointOfInterestResponse;
 import lombok.experimental.UtilityClass;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @UtilityClass
@@ -25,7 +24,6 @@ public class PointOfInterestMapper {
                 .description(request.description())
                 .latitude(request.latitude())
                 .longitude(request.longitude())
-                .createdAt(LocalDateTime.now())
                 .build();
     }
 
@@ -41,7 +39,6 @@ public class PointOfInterestMapper {
                 .distanceFromPointM(distance)
                 .capturedInApp(true)
                 .validated(true)
-                .createdAt(LocalDateTime.now())
                 .build();
     }
 

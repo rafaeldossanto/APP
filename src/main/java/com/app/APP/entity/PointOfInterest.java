@@ -4,6 +4,7 @@ import com.app.APP.model.enums.PointType;
 import com.app.APP.trace.TraceContext;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -18,6 +19,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -25,6 +28,7 @@ import java.time.LocalDateTime;
 @Table(name = "pontos_interesse", indexes = {
         @Index(name = "idx_ponto_caminho", columnList = "caminho_id")
 })
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -58,7 +62,8 @@ public class PointOfInterest {
     @Column(nullable = false)
     private Double longitude;
 
-    @Column(name = "criado_em")
+    @CreatedDate
+    @Column(name = "criado_em", updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "trace_id")
