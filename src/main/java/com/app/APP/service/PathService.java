@@ -41,10 +41,19 @@ public class PathService {
     private final AdventureRepository adventureRepository;
     private final AdventureAccessService accessService;
 
+    /**
+     * Inicia um caminho. Transacional e com lock de escrita na aventura: o numero
+     * do caminho vem de {@code countByAdventureId()+1} e caminhos sao individuais
+     * (varios participantes de uma aventura em grupo podem iniciar ao mesmo
+     * tempo), entao a contagem precisa ser serializada por aventura para nao
+     * gerar numero duplicado. O lock e por aventura — aventuras diferentes nao
+     * se bloqueiam.
+     */
+    @Transactional
     public PathResponse start(String userId, PathRequest request) {
         log.info("Starting path for user: {} in adventure: {}", userId, request.adventureId());
 
-        Adventure adventure = adventureRepository.findById(request.adventureId())
+        Adventure adventure = adventureRepository.findByIdForUpdate(request.adventureId())
                 .orElseThrow(() -> new IllegalArgumentException("Aventura nao encontrada"));
         accessService.validateContribute(userId, adventure);
 

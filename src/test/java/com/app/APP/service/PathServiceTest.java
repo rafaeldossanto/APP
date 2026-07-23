@@ -53,7 +53,7 @@ class PathServiceTest {
         Adventure adventure = AdventureStub.anAdventure().build();
         Path saved = PathStub.aPath().build();
 
-        when(adventureRepository.findById(request.adventureId())).thenReturn(Optional.of(adventure));
+        when(adventureRepository.findByIdForUpdate(request.adventureId())).thenReturn(Optional.of(adventure));
         when(pathRepository.countByAdventureId(request.adventureId())).thenReturn(2);
         when(pathRepository.save(any(Path.class))).thenReturn(saved);
 
@@ -71,7 +71,7 @@ class PathServiceTest {
     @DisplayName("start should fail when adventure does not exist")
     void shouldFailStartWithoutAdventure() {
         PathRequest request = PathStub.aRequest();
-        when(adventureRepository.findById(request.adventureId())).thenReturn(Optional.empty());
+        when(adventureRepository.findByIdForUpdate(request.adventureId())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.start(PathStub.USER_ID, request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -85,7 +85,7 @@ class PathServiceTest {
     void shouldFailStartWithoutBond() {
         PathRequest request = PathStub.aRequest();
         Adventure adventure = AdventureStub.anAdventure().build();
-        when(adventureRepository.findById(request.adventureId())).thenReturn(Optional.of(adventure));
+        when(adventureRepository.findByIdForUpdate(request.adventureId())).thenReturn(Optional.of(adventure));
         doThrow(new IllegalArgumentException("Voce nao participa desta aventura"))
                 .when(accessService).validateContribute("intruso", adventure);
 
