@@ -14,6 +14,7 @@ import java.util.List;
 public record RegionRequest(
         @JsonProperty("nome") @NotBlank String name,
         @JsonProperty("descricao") String description,
+        @JsonProperty("capaUrl") String coverUrl,
         @JsonProperty("visibilidade") RegionVisibility visibility,
         @JsonProperty("cidades") @Valid List<CityDTO> cities
 ) {}

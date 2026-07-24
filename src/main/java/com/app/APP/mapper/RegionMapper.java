@@ -24,6 +24,7 @@ public class RegionMapper {
                 .userId(userId)
                 .name(request.name())
                 .description(request.description())
+                .coverUrl(request.coverUrl())
                 .visibility(visibilityOrDefault(request))
                 .cities(toCities(request.cities()))
                 .build();
@@ -33,6 +34,7 @@ public class RegionMapper {
     public static void apply(Region region, RegionRequest request) {
         region.setName(request.name());
         region.setDescription(request.description());
+        region.setCoverUrl(request.coverUrl());
         region.setVisibility(visibilityOrDefault(request));
         region.setCities(toCities(request.cities()));
     }
@@ -43,6 +45,7 @@ public class RegionMapper {
                 .userId(region.getUserId())
                 .name(region.getName())
                 .description(region.getDescription())
+                .coverUrl(region.getCoverUrl())
                 .visibility(region.getVisibility())
                 .cities(region.getCities().stream()
                         .map(c -> new CityDTO(c.getName(), c.getLatitude(), c.getLongitude(), c.getAltitude()))

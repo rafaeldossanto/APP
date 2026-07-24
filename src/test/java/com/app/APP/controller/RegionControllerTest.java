@@ -65,7 +65,7 @@ class RegionControllerTest {
     @Test
     @DisplayName("POST /regiao cria regiao com dados validos")
     void shouldCreateRegion() throws Exception {
-        RegionRequest request = new RegionRequest("Serra do Caparao", null, RegionVisibility.PRIVADA, List.of());
+        RegionRequest request = new RegionRequest("Serra do Caparao", null, null, RegionVisibility.PRIVADA, List.of());
         when(regionService.create(any(), any(RegionRequest.class))).thenReturn(responseStub());
 
         mockMvc.perform(post("/regiao")
@@ -80,7 +80,7 @@ class RegionControllerTest {
     @Test
     @DisplayName("POST /regiao retorna 400 quando nome esta em branco")
     void shouldRejectBlankName() throws Exception {
-        RegionRequest request = new RegionRequest("", null, RegionVisibility.PRIVADA, List.of());
+        RegionRequest request = new RegionRequest("", null, null, RegionVisibility.PRIVADA, List.of());
 
         mockMvc.perform(post("/regiao")
                         .with(jwt().jwt(j -> j.subject(USER_ID).claim("codigoUsuario", "code-1")))
@@ -115,7 +115,7 @@ class RegionControllerTest {
     @Test
     @DisplayName("PUT /regiao/{id} atualiza regiao")
     void shouldUpdateRegion() throws Exception {
-        RegionRequest request = new RegionRequest("Atualizada", null, RegionVisibility.PUBLICA, List.of());
+        RegionRequest request = new RegionRequest("Atualizada", null, null, RegionVisibility.PUBLICA, List.of());
         RegionResponse updated = RegionResponse.builder().id(REGION_ID).userId(USER_ID).name("Atualizada")
                 .visibility(RegionVisibility.PUBLICA).cities(List.of()).createdAt(LocalDateTime.now()).build();
         when(regionService.update(any(), eq(REGION_ID), any(RegionRequest.class))).thenReturn(updated);

@@ -14,6 +14,7 @@ public record RegionResponse(
         @JsonProperty("usuarioId") String userId,
         @JsonProperty("nome") String name,
         @JsonProperty("descricao") String description,
+        @JsonProperty("capaUrl") String coverUrl,
         @JsonProperty("visibilidade") RegionVisibility visibility,
         @JsonProperty("cidades") List<CityDTO> cities,
         @JsonProperty("criadoEm") LocalDateTime createdAt

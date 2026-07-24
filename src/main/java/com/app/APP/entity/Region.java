@@ -53,6 +53,11 @@ public class Region {
     @Column(name = "descricao")
     private String description;
 
+    /** URL da foto de capa (upload via servico de midia). Opcional. Presigned
+     *  URL carrega assinatura na query e estoura varchar(255) — dai o length. */
+    @Column(name = "capa_url", length = 1024)
+    private String coverUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "visibilidade", nullable = false)
     @Builder.Default

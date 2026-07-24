@@ -61,7 +61,7 @@ class RegionServiceTest {
 
     private RegionRequest aRequest() {
         return new RegionRequest("Serra do Caparao", "Regiao de montanhas",
-                RegionVisibility.PRIVADA, List.of());
+                "http://midia/capa.jpg", RegionVisibility.PRIVADA, List.of());
     }
 
     // ---- create / listMine ----
@@ -78,6 +78,7 @@ class RegionServiceTest {
         assertThat(captor.getValue().getUserId()).isEqualTo(OWNER);
         assertThat(captor.getValue().getId()).isNotNull();
         assertThat(response.name()).isEqualTo("Serra do Caparao");
+        assertThat(response.coverUrl()).isEqualTo("http://midia/capa.jpg");
     }
 
     @Test
